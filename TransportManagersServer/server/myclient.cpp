@@ -10,10 +10,17 @@
 #include "../Common/blockreader.h"
 #include "../Common/blockwriter.h"
 
+unsigned constexpr const_hash(char const *input)
+{
+    return *input ?
+        static_cast<unsigned int>(*input) + 33 * const_hash(input + 1) :
+        5381;
+}
+
 MyClient::MyClient(QObject *parent) :
     QObject(parent)
 {
-    QThreadPool::globalInstance()->setMaxThreadCount(50);
+    QThreadPool::globalInstance()->setMaxThreadCount(4);
 }
 
 void MyClient::SetSocket(int Descriptor)
@@ -84,12 +91,19 @@ void MyClient::TaskResult(QTcpSocket* socket)
     //pl->insertPlainText(message);
 
     QByteArray SQL_Edit;
-    quint16 key;
+    QString key;
     BlockReader br(socket);
-    br.stream() >> SQL_Edit >> key;
+    br.stream() >> key;
+    br.stream() >> SQL_Edit;
+
+
+    switch(const_hash(key.toStdString().c_str()))
+    {
+        case const_hash("key"): qDebug() << "one();"; break;
+        case const_hash("two"): qDebug() << "two();"; break;
+    }
 
     if(!m_Query->exec(SQL_Edit))
-    //if(!m_Query->exec("SELECT * FROM test LIMIT 2"))
     {
         qDebug() << m_Query->lastError().databaseText();
         qDebug() << m_Query->lastError().driverText();
@@ -100,7 +114,7 @@ void MyClient::TaskResult(QTcpSocket* socket)
 
 
         BlockWriter* bw = new BlockWriter(socket);
-        bw->stream() << QString("Hello World!") << QString("bababa") << SQLQuery(SQL_Edit,*m_Query).toUtf8();
+        bw->stream() << key << SQLQuery(SQL_Edit,*m_Query).toUtf8();
         delete bw;
 
 

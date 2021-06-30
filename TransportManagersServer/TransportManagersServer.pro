@@ -12,6 +12,7 @@ TARGET = TransportManagersServer
 SOURCES += \
     ../Common/blockreader.cpp \
     ../Common/blockwriter.cpp \
+    ../Common/qjsontablemodel.cpp \
     dialogrecorteditform.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -23,6 +24,7 @@ SOURCES += \
 HEADERS += \
     ../Common/blockreader.h \
     ../Common/blockwriter.h \
+    ../Common/qjsontablemodel.h \
     dialogrecorteditform.h \
     mainwindow.h \
     server/myclient.h \
