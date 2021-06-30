@@ -12,17 +12,12 @@
 #include "../Common/blockreader.h"
 #include "../Common/blockwriter.h"
 
-
-unsigned constexpr const_hash(char const *input)
-{
-    return *input ? static_cast<unsigned int>(*input) + 33 * const_hash(input + 1) : 5381;
-}
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
 
     QJsonTableModel::Header header;
     header.push_back( QJsonTableModel::Heading( { {"title","ID"},   {"index","ID"} }) );
@@ -31,14 +26,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     episodes = new QJsonTableModel( header, this );
 
-    //------------------------------------------------------//
+    //============================================================//
 
-    m_TCPSocket = new QTcpSocket(this);
+    m_TCPSocket = new QTcpSocket;
 
-    connect(m_TCPSocket, SIGNAL(hostFound()), this, SLOT(weAreConnected()));
-    connect(m_TCPSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(displayError(QAbstractSocket::SocketError)));
-    connect(m_TCPSocket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
-    connect(m_TCPSocket, SIGNAL(disconnected()), m_TCPSocket, SLOT(sockDisc()));
+    connect(ui->pushButton_Connected, SIGNAL(clicked()), this, SLOT(sendSomething()));
 
 }
 
@@ -51,73 +43,78 @@ MainWindow::~MainWindow()
 
 void MainWindow::onReadyRead()
 {
-    if(!m_TCPSocket || (m_TCPSocket->state() != QTcpSocket::ConnectedState)) return;
+   // QByteArray datas = m_TCPSocket.readAll();
+   // qDebug() << datas;
+    //_socket.write(QByteArray("ok !\n"));
 
-    if(m_TCPSocket->waitForConnected(500))
+    //QString s1,s2;
+    //BlockReader br(&m_TCPSocket);
+    //br.stream() >> s1 >> s2;
+    //qDebug() << s1 << s2;
+
+    QByteArray datas;
+    QString s,s2;
+    BlockReader br(m_TCPSocket);
+    br.stream() >> s >> s2 >> datas;
+    qDebug()  << s << s2 << datas;
+    //delete br;
+
+
+    //ui->textEdit->setHtml(ui->textEdit->toHtml() + s.toUtf8() + "<br>");
+    //ui->textEdit->setHtml(ui->textEdit->toHtml() + s2.toUtf8() + "<br>");
+    ui->textEdit->setHtml(ui->textEdit->toHtml() + QString::fromUtf8(datas).toUtf8() + "<br>");
+    ui->textEdit->verticalScrollBar()->setSliderPosition(ui->textEdit->verticalScrollBar()->maximum());
+
+
+    /**
+    //First get the filesize we're going to download
+    QDataStream in(&m_TCPSocket);
+    in.setVersion(QDataStream::Qt_4_0);
+
+
+     ui->textEdit->setHtml(ui->textEdit->toHtml() + hello_there.toUtf8() + "<br>");
+     ui->textEdit->verticalScrollBar()->setSliderPosition(ui->textEdit->verticalScrollBar()->maximum());
+
+
+    /**
+      QByteArray block;
+      QDataStream in(&m_TCPSocket);
+      in.setVersion( QDataStream::Qt_4_8 );
+      in >> block;
+
+
+
+
+
+    ui->textEdit->setHtml(ui->textEdit->toHtml() + QString::fromUtf8(block) + "<br>");
+    ui->textEdit->verticalScrollBar()->setSliderPosition(ui->textEdit->verticalScrollBar()->maximum());
+
+
+    /**/
+
+    QJsonParseError parseError;
+    QJsonDocument doc = QJsonDocument::fromJson(datas, &parseError);
+    episodes->setJson( doc );
+    ui->tableView->setModel(episodes);
+
+    if(parseError.error ==  QJsonParseError::NoError)
     {
-
-        QByteArray datas;
-        QString key = "key";
-        BlockReader br(m_TCPSocket);
-        br.stream() >> key >> datas;
-        qDebug()  << key << datas;
-        //delete br;
-
-        switch(const_hash(key.toStdString().c_str()))
-        {
-            case const_hash("key"): qDebug() << "one();"; break;
-            case const_hash("two"): qDebug() << "two();"; break;
-        }
-
-
-        //ui->textEdit->setHtml(ui->textEdit->toHtml() + s.toUtf8() + "<br>");
-        ui->textEdit->setHtml(ui->textEdit->toHtml() + key.toUtf8() + "<br>");
-        ui->textEdit->setHtml(ui->textEdit->toHtml() + QString::fromUtf8(datas).toUtf8() + "<br>");
-        ui->textEdit->verticalScrollBar()->setSliderPosition(ui->textEdit->verticalScrollBar()->maximum());
-
-        /**/
-
-        QJsonParseError parseError;
-        QJsonDocument doc = QJsonDocument::fromJson(datas, &parseError);
-        episodes->setJson( doc );
-        ui->tableView->setModel(episodes);
-
-        if(parseError.error ==  QJsonParseError::NoError)
-        {
-          // Has a Error
-          return;
-        }
-
-        QJsonObject obj = doc.object();
-
-        // acessing all object Keys
-        for(const QString& key : obj.keys())
-        {
-           qDebug() << obj[key];
-        }
-        /**/
+      // Has a Error
+      return;
     }
-    else
+
+    QJsonObject obj = doc.object();
+
+    // acessing all object Keys
+    for(const QString& key : obj.keys())
     {
-        qDebug() << "<-- disconnect -->";
-        delete m_TCPSocket;
+       qDebug() << obj[key];
     }
+    /**/
 
 }
 
 
-void MainWindow::on_pushButton_clicked()
-{
-    if(!m_TCPSocket || (m_TCPSocket->state() != QTcpSocket::ConnectedState)) return;
-
-    QByteArray  SQL_Edit = ui->lineEdit_command_sql_send->text().toUtf8();
-    QString key = "key";
-    BlockWriter* bw = new BlockWriter(m_TCPSocket);
-    bw->stream() << key << SQL_Edit;
-    delete bw;
-
-   // m_TCPSocket.write(ui->lineEdit_command_sql_send->text().toUtf8());
-}
 
 
 void MainWindow::on_pushButton_2_clicked()
@@ -130,11 +127,18 @@ void MainWindow::on_pushButton_2_clicked()
     if (m_TCPSocket->waitForConnected(1000))
     {
         qDebug("Connected!");
+
+       //m_TCPSocket.connectToHost(QHostAddress("192.168.1.3"), 1234);
+
+        connect(m_TCPSocket, SIGNAL(hostFound()), this, SLOT(weAreConnected()));
+        connect(m_TCPSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(displayError(QAbstractSocket::SocketError)));
+        connect(m_TCPSocket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
+        connect(m_TCPSocket, SIGNAL(disconnected()), m_TCPSocket, SLOT(deleteLater()));
     }
-    else if(m_TCPSocket->state() != QTcpSocket::ConnectedState)
+    else
     {
-        qDebug("No Connected!");
-        m_TCPSocket->disconnectFromHost();
+       qDebug("No Connected!");
+       delete  m_TCPSocket;
     }
 }
 
@@ -169,9 +173,12 @@ void MainWindow::on_pushButton_test_clicked()
 
 
 
+
+
 void MainWindow::weAreConnected()
 {
-    qDebug() << ("<-- Connected -->");
+    //ui->iplabel->setText("Connected");
+    qDebug() << "Connected";
 }
 
 void MainWindow::displayError(QAbstractSocket::SocketError socketError)
@@ -198,16 +205,24 @@ void MainWindow::displayError(QAbstractSocket::SocketError socketError)
                                      .arg(m_TCPSocket->errorString()));
      }
 
-   // delete m_TCPSocket;
-   // m_TCPSocket = nullptr;
+    delete m_TCPSocket;
 }
 
-void MainWindow::sockDisc()
+void MainWindow::sendSomething()
 {
-    m_TCPSocket->disconnectFromHost();
-    m_TCPSocket->deleteLater();
+    QByteArray  SQL_Edit = ui->lineEdit_command_sql_send->text().toUtf8();
+    quint16 key = 100;
+    BlockWriter* bw = new BlockWriter(m_TCPSocket);
+    bw->stream() << SQL_Edit << key;
+    delete bw;
 
-   // delete m_TCPSocket;
-   // m_TCPSocket = nullptr;
+   // m_TCPSocket.write(ui->lineEdit_command_sql_send->text().toUtf8());
 }
+
+
+
+
+
+
+
 

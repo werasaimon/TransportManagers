@@ -23,7 +23,7 @@ public slots:
     void onReadyRead();
 
 private slots:
-    void on_pushButton_clicked();
+
     void on_pushButton_2_clicked();
 
     void on_tableView_doubleClicked(const QModelIndex &index);
@@ -32,12 +32,11 @@ private slots:
 
     void weAreConnected();
     void displayError(QAbstractSocket::SocketError socketError);
-    void sockDisc();
-//    void sendSomething();
+    void sendSomething();
 
 private:
     Ui::MainWindow *ui;
-    QTcpSocket  *m_TCPSocket = nullptr;
+    QTcpSocket  *m_TCPSocket;
 
     QJsonTableModel* episodes;
 };
