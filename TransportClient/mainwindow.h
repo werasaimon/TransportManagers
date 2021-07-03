@@ -35,10 +35,16 @@ private slots:
     void sockDisc();
 //    void sendSomething();
 
+
+    void on_pushButton_A_clicked();
+
 private:
     Ui::MainWindow *ui;
     QTcpSocket  *m_TCPSocket = nullptr;
 
     QJsonTableModel* episodes;
+
+    void AnswerToKey_SQL(QDataStream &_stream_tcp_ip);
+    void AnswerToKey_User(QDataStream &_stream_tcp_ip);
 };
 #endif // MAINWINDOW_H
