@@ -24,6 +24,7 @@ SOURCES += \
 HEADERS += \
     ../Common/blockreader.h \
     ../Common/blockwriter.h \
+    ../Common/help_func.hpp \
     ../Common/qjsontablemodel.h \
     dialogrecorteditform.h \
     mainwindow.h \

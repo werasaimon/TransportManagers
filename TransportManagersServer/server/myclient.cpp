@@ -9,13 +9,8 @@
 
 #include "../Common/blockreader.h"
 #include "../Common/blockwriter.h"
+#include "../Common/help_func.hpp"
 
-unsigned constexpr const_hash(char const *input)
-{
-    return *input ?
-        static_cast<unsigned int>(*input) + 33 * const_hash(input + 1) :
-        5381;
-}
 
 MyClient::MyClient(QObject *parent) :
     QObject(parent)
@@ -90,94 +85,16 @@ void MyClient::TaskResult(QTcpSocket* socket)
    // Buffer.append(message);
     //pl->insertPlainText(message);
 
-    QByteArray SQL_Edit;
+
     QString key;
     BlockReader br(socket);
     br.stream() >> key;
-    br.stream() >> SQL_Edit;
-
 
     switch(const_hash(key.toStdString().c_str()))
     {
-        case const_hash("key"): qDebug() << "one();"; break;
-        case const_hash("two"): qDebug() << "two();"; break;
+        case const_hash("sql"):  AnswerToKey_SQL(br.stream()); break;
+        case const_hash("user"): AnswerToKey_User(br.stream()); break;
     }
-
-    if(!m_Query->exec(SQL_Edit))
-    {
-        qDebug() << m_Query->lastError().databaseText();
-        qDebug() << m_Query->lastError().driverText();
-        return;
-    }
-    else
-    {
-
-
-        BlockWriter* bw = new BlockWriter(socket);
-        bw->stream() << key << SQLQuery(SQL_Edit,*m_Query).toUtf8();
-        delete bw;
-
-
-
-        /**
-               QByteArray block;
-               QDataStream out(&block, QIODevice::WriteOnly);      //we will serialize the data in the array block
-
-               out.setVersion(QDataStream::Qt_4_0);
-
-               out << (quint16)0;                                  //we reserve space for a 16 bit integer that will contain the total size of the data block we are sending
-               out << QString( "something" );                      //Sending the name of the file
-               out.device()->seek(0);                              //Going back to the beginning of the array
-               out << (quint16)(block.size() - sizeof(quint16));   //overwrite the reserved 16 bit integer value with the total size of the array
-
-               socket->write(block);                               //Send message
-
-
-        /**
-          QByteArray block;
-          QDataStream out( &block, QIODevice::WriteOnly );
-          out.setDevice( socket );
-          out.setVersion( QDataStream::Qt_4_8 );
-          out << "HELLO CLIENT!\x0d\x0a";
-
-
-         QBuffer buffer;
-         buffer.open(QIODevice::WriteOnly);
-
-         QDataStream _stream;
-         _stream.setVersion(QDataStream::Qt_4_8);
-         _stream.setDevice(&buffer);
-
-
-        /**
-        QByteArray block;
-        QDataStream out(&block, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_4_8);
-        out << "Some Text";
-        socket->write(block);
-
-
-        /**
-        BlockWriter bw(socket);
-        bw.stream() << QString("wera") << QString("Hello World!");
-        bw.~BlockWriter();
-        **/
-
-//        socket->write( SQLQuery(message,*m_Query).toUtf8() );
-
-//        while (m_Query->next())
-//        {
-//            QString id   = "<br> ID: " + m_Query->value(0).toString() + " ";
-//            QString text = "Text: " + m_Query->value(1).toString() + " ";
-//            QString data = "Data: " +m_Query->value(2).toString() + " ";
-//            QString send = id+text+data + " </br>";
-
-//            qDebug() << id << " " << text << " " << data;
-
-//            socket->write(send.toUtf8());
-//        }
-    }
-    //socket->write(message);
 }
 
 QString MyClient::SQLQuery(const QString &sqlquery , QSqlQuery query)
@@ -197,6 +114,88 @@ QString MyClient::SQLQuery(const QString &sqlquery , QSqlQuery query)
     json.setArray(recordsArray);
 
     return json.toJson();
+}
+
+void MyClient::AnswerToKey_SQL(QDataStream &_stream_tcp_ip)
+{
+      QByteArray SQL_Edit;
+     _stream_tcp_ip >> SQL_Edit;
+
+     if(!m_Query->exec(SQL_Edit))
+     {
+         qDebug() << m_Query->lastError().databaseText();
+         qDebug() << m_Query->lastError().driverText();
+
+         QString key = "error";
+         BlockWriter* bw = new BlockWriter(socket);
+         bw->stream() << key;
+         bw->stream() << m_Query->lastError().databaseText();
+         bw->stream() << m_Query->lastError().driverText();
+         delete bw;
+
+         return;
+
+     }
+     else
+     {
+
+         QString key = "sql";
+         BlockWriter* bw = new BlockWriter(socket);
+         bw->stream() << key << SQLQuery(SQL_Edit,*m_Query).toUtf8();
+         delete bw;
+     }
+}
+
+void MyClient::AnswerToKey_User(QDataStream &_stream_tcp_ip)
+{
+
+    QString username;
+    QString password;
+
+    _stream_tcp_ip >> username;
+    _stream_tcp_ip >> password;
+
+    qDebug() << username;
+    qDebug() << password;
+
+    m_Query->prepare("SELECT ID FROM users WHERE Username = :username AND Password = :password");
+    m_Query->bindValue(":username", username);
+    m_Query->bindValue(":password", password);
+    m_Query->exec();
+    if(!m_Query->isActive())
+    {
+        qDebug() << ("SQL Statement execution failed");
+        return;
+    }
+
+
+     int i_cid = m_Query->record().indexOf("ID");
+    int counter = 0;
+    while (m_Query->next())
+    {
+        counter++;
+        qDebug() << m_Query->value(i_cid).toInt();
+    }
+
+    //==========================================//
+
+    BlockWriter* bw = new BlockWriter(socket);
+
+    QString key = "user";
+    bw->stream() << key;
+
+    if(counter==1)
+    {
+        qDebug() << ("Sign in successful");
+        bw->stream() << QString("yes connect user");
+    }
+    if(counter<1)
+    {
+        qDebug() << ("Sign in unsuccessful");
+        bw->stream() << QString("no connect user");
+    }
+
+    delete bw;
 }
 
 

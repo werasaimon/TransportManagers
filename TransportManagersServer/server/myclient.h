@@ -42,6 +42,10 @@ public slots:
 private:
     QTcpSocket *socket;
     QString _str;
+
+
+    void AnswerToKey_SQL(QDataStream &_stream_tcp_ip);
+    void AnswerToKey_User(QDataStream &_stream_tcp_ip);
     
 };
 

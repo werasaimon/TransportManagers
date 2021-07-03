@@ -24,13 +24,13 @@
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>sql run</string>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton_2">
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>140</x>
       <y>500</y>
       <width>93</width>
       <height>28</height>
@@ -43,7 +43,7 @@
    <widget class="QPushButton" name="pushButton_3">
     <property name="geometry">
      <rect>
-      <x>260</x>
+      <x>230</x>
       <y>500</y>
       <width>93</width>
       <height>28</height>
@@ -56,7 +56,7 @@
    <widget class="QPushButton" name="pushButton_4">
     <property name="geometry">
      <rect>
-      <x>370</x>
+      <x>320</x>
       <y>500</y>
       <width>93</width>
       <height>28</height>
@@ -69,7 +69,7 @@
    <widget class="QPushButton" name="pushButton_5">
     <property name="geometry">
      <rect>
-      <x>480</x>
+      <x>410</x>
       <y>500</y>
       <width>93</width>
       <height>28</height>
@@ -82,7 +82,7 @@
    <widget class="QPushButton" name="pushButton_6">
     <property name="geometry">
      <rect>
-      <x>590</x>
+      <x>500</x>
       <y>500</y>
       <width>93</width>
       <height>28</height>
@@ -102,7 +102,7 @@
      </rect>
     </property>
     <property name="plainText">
-     <string>SELECT * FROM test WHERE ID=3</string>
+     <string>SELECT * FROM preorders WHERE ID&lt;3</string>
     </property>
    </widget>
    <widget class="QSplitter" name="splitter">
@@ -117,7 +117,7 @@
     <property name="orientation">
      <enum>Qt::Vertical</enum>
     </property>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <widget class="QLineEdit" name="lineEdit_IP">
@@ -143,6 +143,19 @@
       <bool>true</bool>
      </attribute>
     </widget>
+   </widget>
+   <widget class="QPushButton" name="pushButton_ttt">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>500</y>
+      <width>93</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>add users</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

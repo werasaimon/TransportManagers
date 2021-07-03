@@ -54,6 +54,8 @@ private slots:
 
     void on_pushButton_7_clicked();
 
+    void on_pushButton_ttt_clicked();
+
 private:
 
     QSqlDatabase db;

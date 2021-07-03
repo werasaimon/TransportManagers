@@ -19,7 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("./users.db");
+    db.setDatabaseName("./database.db");
     //db.setUserName("werasaimon");
     //db.setPassword("123qwe");
 
@@ -30,22 +30,34 @@ MainWindow::MainWindow(QWidget *parent)
     else
     {
         qDebug() << "Succses!";
-        QString quary = "CREATE TABLE test ("
+        QString quary = "CREATE TABLE preorders ("
                         "ID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,"
                         "Text VARCHAR(255),"
                         "Data DATATIME);";
 
+        QString quary2 = "CREATE TABLE users ("
+                        "Username VARCHAR(255),"
+                        "Password VARCHAR(255),"
+                        "ID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE);";
+
         QSqlQuery qry(db);
+
         if(!qry.exec(quary))
         {
-            qDebug() << "error creating table";
+            qDebug() << "error creating table test";
         }
+
+        if(!qry.exec(quary2))
+        {
+            qDebug() << "error creating table users";
+        }
+
         //qDebug() << "yes create table";
     }
 
     t_model = new QSqlTableModel2(this,db);
     t_model->setEditStrategy(QSqlTableModel::OnManualSubmit);
-    t_model->setTable("test");
+    t_model->setTable("preorders");
     t_model->select();
 
     ui->tableView->setModel(t_model);
@@ -65,12 +77,13 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete m_Query;
 }
 
 
 void MainWindow::on_pushButton_clicked()
 {
-    if(!m_Query->exec("SELECT * FROM test"))
+    if(!m_Query->exec(ui->plainTextEditScript->toPlainText().toStdString().c_str()))
     {
         qDebug() << m_Query->lastError().databaseText();
         qDebug() << m_Query->lastError().driverText();
@@ -78,7 +91,6 @@ void MainWindow::on_pushButton_clicked()
     }
     else
     {
-
         qDebug() << "query.record()";
         while (m_Query->next())
         {
@@ -182,5 +194,19 @@ void MainWindow::on_pushButton_7_clicked()
     m_Server = new MyServer();
     m_Server->StartServer(IP,PORT);
     m_Server->m_Query = m_Query;
+}
+
+
+void MainWindow::on_pushButton_ttt_clicked()
+{
+     QSqlQuery query;
+     query.prepare("INSERT INTO users (Username, Password, ID) "
+                   "VALUES (:Username, :Password, :ID)");
+
+     query.bindValue(":Username", "wera");
+     query.bindValue(":Password", "123");
+     query.bindValue(":ID", 1001);
+
+     query.exec();
 }
 
