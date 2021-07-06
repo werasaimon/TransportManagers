@@ -136,6 +136,19 @@ void MainWindow::on_pushButton_2_clicked()
     else
     {
         m_TCPSocket->disconnectFromHost();
+
+        //-----------------------------------------------------//
+
+        QAbstractItemModel* mdl = ui->tableView->model();
+        mdl->removeRows(0,mdl->rowCount());
+        mdl->removeColumns(0,mdl->columnCount());
+
+
+
+        ui->tableView->setModel(nullptr);
+
+        //-----------------------------------------------------//
+
         isConnected = false;
         ui->pushButton_2->setText("Connected");
     }

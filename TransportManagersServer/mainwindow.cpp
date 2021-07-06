@@ -42,10 +42,11 @@ MainWindow::MainWindow(QWidget *parent)
 
 
         QString quary3 = "CREATE TABLE fulfill ("
+                         "ID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,"
+                         "ID_Oreder INTEGER,"
                          "Username VARCHAR(255),"
                          "Text VARCHAR(255),"
-                         "Data DATATIME,"
-                         "ID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE);";
+                         "Data DATATIME);";
 
         QSqlQuery qry(db);
 

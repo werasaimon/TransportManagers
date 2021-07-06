@@ -217,13 +217,13 @@ void MyClient::AnswerToKey_Order(QDataStream &_stream_tcp_ip)
     qDebug() << "Username: " << _order.Username;
 
 
-    m_Query->prepare("INSERT INTO fulfill (Username, Text, Data, ID) "
-                     "VALUES (:Username, :Text, :Data, :ID)");
+    m_Query->prepare("INSERT INTO fulfill (ID , Username, Text, Data, ID_Oreder) "
+                     "VALUES (:ID, :Username, :Text, :Data, :ID_Oreder)");
 
     m_Query->bindValue(":Username", _order.Username);
     m_Query->bindValue(":Text", _order.Text);
     m_Query->bindValue(":Data", _order.Data);
-    m_Query->bindValue(":ID", _order.ID);
+    m_Query->bindValue(":ID_Oreder", _order.ID);
 
     m_Query->exec();
 }
