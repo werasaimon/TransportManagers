@@ -10,6 +10,7 @@
 #include "../Common/blockreader.h"
 #include "../Common/blockwriter.h"
 #include "../Common/help_func.hpp"
+#include "../Common/order.h"
 
 
 MyClient::MyClient(QObject *parent) :
@@ -94,6 +95,8 @@ void MyClient::TaskResult(QTcpSocket* socket)
     {
         case const_hash("sql"):  AnswerToKey_SQL(br.stream()); break;
         case const_hash("user"): AnswerToKey_User(br.stream()); break;
+        case const_hash("order"): AnswerToKey_Order(br.stream()); break;
+        case const_hash("list"): AnswerToKey_List(br.stream()); break;
     }
 }
 
@@ -196,6 +199,38 @@ void MyClient::AnswerToKey_User(QDataStream &_stream_tcp_ip)
     }
 
     delete bw;
+}
+
+void MyClient::AnswerToKey_Order(QDataStream &_stream_tcp_ip)
+{
+    Order _order;
+    _stream_tcp_ip >> _order.ID;
+    _stream_tcp_ip >> _order.Text;
+    _stream_tcp_ip >> _order.Data;
+    _stream_tcp_ip >> _order.Username;
+
+
+
+    qDebug() << "ID: " << _order.ID;
+    qDebug() << "Text: " << _order.Text;
+    qDebug() << "Data: " << _order.Data;
+    qDebug() << "Username: " << _order.Username;
+
+
+    m_Query->prepare("INSERT INTO fulfill (Username, Text, Data, ID) "
+                     "VALUES (:Username, :Text, :Data, :ID)");
+
+    m_Query->bindValue(":Username", _order.Username);
+    m_Query->bindValue(":Text", _order.Text);
+    m_Query->bindValue(":Data", _order.Data);
+    m_Query->bindValue(":ID", _order.ID);
+
+    m_Query->exec();
+}
+
+void MyClient::AnswerToKey_List(QDataStream &_stream_tcp_ip)
+{
+
 }
 
 

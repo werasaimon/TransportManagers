@@ -12,7 +12,9 @@ TARGET = TransportManagersServer
 SOURCES += \
     ../Common/blockreader.cpp \
     ../Common/blockwriter.cpp \
+    ../Common/order.cpp \
     ../Common/qjsontablemodel.cpp \
+    dialogaddclient.cpp \
     dialogrecorteditform.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -25,7 +27,9 @@ HEADERS += \
     ../Common/blockreader.h \
     ../Common/blockwriter.h \
     ../Common/help_func.hpp \
+    ../Common/order.h \
     ../Common/qjsontablemodel.h \
+    dialogaddclient.h \
     dialogrecorteditform.h \
     mainwindow.h \
     server/myclient.h \
@@ -34,6 +38,7 @@ HEADERS += \
 
 
 FORMS += \
+    dialogaddclient.ui \
     dialogrecorteditform.ui \
     mainwindow.ui
 

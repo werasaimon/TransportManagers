@@ -6,6 +6,7 @@
 #include <QSqlQuery>
 #include <QSqlTableModel>
 #include "dialogrecorteditform.h"
+#include "dialogaddclient.h"
 
 #include "server/myserver.h"
 
@@ -58,10 +59,16 @@ private slots:
 
 private:
 
-    QSqlDatabase db;
+
     Ui::MainWindow *ui;
-    QSqlTableModel2 *t_model;
+
     DialogRecortEditForm *EditForm;
+    DialogAddClient *m_AddClientWidget;
+
+    //--------------------------------//
+
+    QSqlDatabase db;
+    QSqlTableModel2 *t_model;
 
     // Create an instance of a server.
     MyServer *m_Server;

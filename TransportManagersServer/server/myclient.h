@@ -46,6 +46,8 @@ private:
 
     void AnswerToKey_SQL(QDataStream &_stream_tcp_ip);
     void AnswerToKey_User(QDataStream &_stream_tcp_ip);
+    void AnswerToKey_Order(QDataStream &_stream_tcp_ip);
+    void AnswerToKey_List(QDataStream &_stream_tcp_ip);
     
 };
 

@@ -36,9 +36,16 @@ MainWindow::MainWindow(QWidget *parent)
                         "Data DATATIME);";
 
         QString quary2 = "CREATE TABLE users ("
-                        "Username VARCHAR(255),"
-                        "Password VARCHAR(255),"
-                        "ID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE);";
+                         "Username VARCHAR(255),"
+                         "Password VARCHAR(255),"
+                         "ID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE);";
+
+
+        QString quary3 = "CREATE TABLE fulfill ("
+                         "Username VARCHAR(255),"
+                         "Text VARCHAR(255),"
+                         "Data DATATIME,"
+                         "ID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE);";
 
         QSqlQuery qry(db);
 
@@ -50,6 +57,11 @@ MainWindow::MainWindow(QWidget *parent)
         if(!qry.exec(quary2))
         {
             qDebug() << "error creating table users";
+        }
+
+        if(!qry.exec(quary3))
+        {
+            qDebug() << "error creating table fulfill";
         }
 
         //qDebug() << "yes create table";
@@ -68,6 +80,10 @@ MainWindow::MainWindow(QWidget *parent)
     EditForm = new DialogRecortEditForm(this);
     EditForm->setParent(this,Qt::Window);
     EditForm->SetModel(t_model);
+
+    //----------------------------------------//
+
+    m_AddClientWidget = new DialogAddClient(this);
 
     //----------------------------------------//
 
@@ -199,14 +215,17 @@ void MainWindow::on_pushButton_7_clicked()
 
 void MainWindow::on_pushButton_ttt_clicked()
 {
-     QSqlQuery query;
-     query.prepare("INSERT INTO users (Username, Password, ID) "
-                   "VALUES (:Username, :Password, :ID)");
+//     QSqlQuery query;
+//     query.prepare("INSERT INTO users (Username, Password, ID) "
+//                   "VALUES (:Username, :Password, :ID)");
 
-     query.bindValue(":Username", "wera");
-     query.bindValue(":Password", "123");
-     query.bindValue(":ID", 1001);
+//     query.bindValue(":Username", "wera");
+//     query.bindValue(":Password", "123");
+//     query.bindValue(":ID", 1001);
 
-     query.exec();
+//     query.exec();
+
+     m_AddClientWidget->setQuery(m_Query);
+     m_AddClientWidget->show();
 }
 
