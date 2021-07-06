@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QTcpSocket>
 #include "../Common/qjsontablemodel.h"
+#include "../Common/order.h"
 
 
 
@@ -34,9 +35,7 @@ private slots:
     void displayError(QAbstractSocket::SocketError socketError);
     void sockDisc();
 //    void sendSomething();
-
-
-    void on_pushButton_A_clicked();
+//    void on_pushButton_A_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -44,7 +43,11 @@ private:
 
     QJsonTableModel* episodes;
 
+    bool isConnected = false;
+
     void AnswerToKey_SQL(QDataStream &_stream_tcp_ip);
     void AnswerToKey_User(QDataStream &_stream_tcp_ip);
+    void AnswerToKey_Order(QDataStream &_stream_tcp_ip);
+    void AnswerToKey_List(QDataStream &_stream_tcp_ip);
 };
 #endif // MAINWINDOW_H

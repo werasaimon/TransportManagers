@@ -56,14 +56,15 @@ void MainWindow::onReadyRead()
     {
         QString key = "key";
         BlockReader br(m_TCPSocket);
-        br.stream() >> key;// >> datas;
-        qDebug()  << key;// << datas;
-        //delete br;
+        br.stream() >> key;
+        qDebug()  << key;
 
         switch(const_hash(key.toStdString().c_str()))
         {
             case const_hash("sql"):  AnswerToKey_SQL(br.stream()); break;
             case const_hash("user"): AnswerToKey_User(br.stream()); break;
+            case const_hash("order"): AnswerToKey_Order(br.stream()); break;
+            case const_hash("list"): AnswerToKey_List(br.stream()); break;
         }
 
 
@@ -102,45 +103,95 @@ void MainWindow::on_pushButton_2_clicked()
     QHostAddress IP = QHostAddress(ui->lineEdit_IP->text());
     quint16 Port = 1234;
 
-    m_TCPSocket->connectToHost(IP, Port);
 
-    if (m_TCPSocket->waitForConnected(1000))
+    if( isConnected == false )
     {
-        qDebug("Connected!");
+        m_TCPSocket->connectToHost(IP, Port);
 
-        if(m_TCPSocket->state() == QTcpSocket::ConnectedState)
+        if (m_TCPSocket->waitForConnected(1000))
         {
-            QString key = "user";
-            BlockWriter* bw = new BlockWriter(m_TCPSocket);
-            bw->stream() << key;
+            qDebug("Connected!");
 
-            QString username = ui->lineEdit_username->text();
-            QString password = ui->lineEdit_password->text();
+            if(m_TCPSocket->state() == QTcpSocket::ConnectedState)
+            {
+                QString key = "user";
+                BlockWriter* bw = new BlockWriter(m_TCPSocket);
+                bw->stream() << key;
 
-            bw->stream() << username;
-            bw->stream() << password;
+                QString username = ui->lineEdit_username->text();
+                QString password = ui->lineEdit_password->text();
+                bw->stream() << username;
+                bw->stream() << password;
 
-            delete bw;
+                delete bw;
+            }
+
         }
-
+        else if(m_TCPSocket->state() != QTcpSocket::ConnectedState)
+        {
+            qDebug("No Connected!");
+            m_TCPSocket->disconnectFromHost();
+        }
     }
-    else if(m_TCPSocket->state() != QTcpSocket::ConnectedState)
+    else
     {
-        qDebug("No Connected!");
         m_TCPSocket->disconnectFromHost();
+        isConnected = false;
+        ui->pushButton_2->setText("Connected");
     }
+
 }
 
 
 void MainWindow::on_tableView_doubleClicked(const QModelIndex &index)
 {
     QJsonObject object = episodes->getJsonObject( index );
-    qDebug() << object["Text"].toString();
 
 
-    QMessageBox Msgbox;
-    Msgbox.setText(object["Text"].toString());
-    Msgbox.exec();
+
+//    QMessageBox Msgbox;
+//    Msgbox.setText(object["Text"].toString());
+//    Msgbox.exec();
+
+     QMessageBox::StandardButton reply;
+     reply = QMessageBox::question(this, "Я хочу Выполнить этот заказ!",
+                                   object["Text"].toString(),
+                                   QMessageBox::Yes|QMessageBox::No);
+     if (reply == QMessageBox::Yes)
+     {
+       qDebug() << "Yes was clicked";
+       //QApplication::quit();
+
+        Order _order;
+       _order.ID = object["ID"].toInt();
+       _order.Text = object["Text"].toString();
+       _order.Data = object["Data"].toString();
+       _order.Username = ui->lineEdit_username->text();
+
+        qDebug() << "ID: " << _order.ID;
+        qDebug() << "Text: " << _order.Text;
+        qDebug() << "Data: " << _order.Data;
+        qDebug() << "Username: " << _order.Username;
+
+        //=========================================//
+
+        BlockWriter* bw = new BlockWriter(m_TCPSocket);
+
+        QString key = "order";
+        bw->stream() << key;
+
+        bw->stream() << _order.ID;
+        bw->stream() << _order.Text;
+        bw->stream() << _order.Data;
+        bw->stream() << _order.Username;
+
+        delete bw;
+
+     }
+     else
+     {
+       qDebug() << "Yes was *not* clicked";
+     }
 
 
 }
@@ -205,63 +256,63 @@ void MainWindow::sockDisc()
 }
 
 
-void MainWindow::on_pushButton_A_clicked()
-{
+//void MainWindow::on_pushButton_A_clicked()
+//{
 
-   // ui->listWidget_A->clear();
+//   // ui->listWidget_A->clear();
 
-    auto itemN = new QListWidgetItem();
-    auto widget = new QWidget();
-
-
-    QFrame *line;
-    line = new QFrame(widget);
-    line->setFrameShape(QFrame::HLine);
-    line->setFrameShadow(QFrame::Sunken);
+//    auto itemN = new QListWidgetItem();
+//    auto widget = new QWidget();
 
 
-    auto widgetText =  new QLabel("I love PyQt \n "
-                                  "iiiiiiiiiiiiiiiiiiopoopopopopopiii \n"
-                                  "jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj \n"
-                                  "ghjgjgjhg hg wer wera!");
+//    QFrame *line;
+//    line = new QFrame(widget);
+//    line->setFrameShape(QFrame::HLine);
+//    line->setFrameShadow(QFrame::Sunken);
 
 
-    auto widgetButton =  new QPushButton("Push Me");
-
-    QString string = "Tuesday, 23 April 12 22:51:41";
-    QString format = "dddd, d MMMM yy hh:mm:ss";
-
-
-    QDateTime nowDateTime;
-    nowDateTime = QDateTime::currentDateTime();
-    long long secs = nowDateTime.toSecsSinceEpoch();
-    QDateTime thisDT = QDateTime::fromTime_t(secs);
-
-    auto widgetLayout = new QVBoxLayout();
-    widgetLayout->addWidget(new QLabel(thisDT.toString()));
-    widgetLayout->addStretch(1);
-    widgetLayout->addWidget(widgetText);
-    widgetLayout->addWidget(widgetButton);
-    widgetLayout->addWidget(line);
-    widgetLayout->addStretch(2);
-
-    widgetLayout->setSizeConstraint(QLayout::SetFixedSize);
-    widgetLayout->setAlignment(Qt::AlignTop);
-    widget->setLayout(widgetLayout);
-    itemN->setSizeHint(widget->sizeHint());
-
-    ui->listWidget_A->addItem(itemN);
-    ui->listWidget_A->setItemWidget(itemN, widget);
+//    auto widgetText =  new QLabel("I love PyQt \n "
+//                                  "iiiiiiiiiiiiiiiiiiopoopopopopopiii \n"
+//                                  "jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj \n"
+//                                  "ghjgjgjhg hg wer wera!");
 
 
+//    auto widgetButton =  new QPushButton("Push Me");
+
+//    QString string = "Tuesday, 23 April 12 22:51:41";
+//    QString format = "dddd, d MMMM yy hh:mm:ss";
 
 
-    //    auto bt = new QPushButton("wera");
-    //    QListWidgetItem *item = new QListWidgetItem("wera");
-    //    ui->listWidget_A->addItem(item);
-    //    ui->listWidget_A->setItemWidget(item,bt);
-    //    ui->listWidget_A->addItem("suka");
-}
+//    QDateTime nowDateTime;
+//    nowDateTime = QDateTime::currentDateTime();
+//    long long secs = nowDateTime.toSecsSinceEpoch();
+//    QDateTime thisDT = QDateTime::fromTime_t(secs);
+
+//    auto widgetLayout = new QVBoxLayout();
+//    widgetLayout->addWidget(new QLabel(thisDT.toString()));
+//    widgetLayout->addStretch(1);
+//    widgetLayout->addWidget(widgetText);
+//    widgetLayout->addWidget(widgetButton);
+//    widgetLayout->addWidget(line);
+//    widgetLayout->addStretch(2);
+
+//    widgetLayout->setSizeConstraint(QLayout::SetFixedSize);
+//    widgetLayout->setAlignment(Qt::AlignTop);
+//    widget->setLayout(widgetLayout);
+//    itemN->setSizeHint(widget->sizeHint());
+
+//    ui->listWidget_A->addItem(itemN);
+//    ui->listWidget_A->setItemWidget(itemN, widget);
+
+
+
+
+//    //    auto bt = new QPushButton("wera");
+//    //    QListWidgetItem *item = new QListWidgetItem("wera");
+//    //    ui->listWidget_A->addItem(item);
+//    //    ui->listWidget_A->setItemWidget(item,bt);
+//    //    ui->listWidget_A->addItem("suka");
+//}
 
 void MainWindow::AnswerToKey_SQL(QDataStream &_stream_tcp_ip)
 {
@@ -299,10 +350,23 @@ void MainWindow::AnswerToKey_User(QDataStream &_stream_tcp_ip)
     {
         m_TCPSocket->disconnectFromHost();
         QMessageBox::information(this, tr("no connect user"), tr(status_connect.toUtf8()));
+        isConnected = false;
     }
     else if(status_connect == QString("yes connect user"))
     {
         QMessageBox::information(this, tr("yes connect user"), tr(status_connect.toUtf8()));
+        isConnected = true;
+        ui->pushButton_2->setText("Disconnected");
     }
+}
+
+void MainWindow::AnswerToKey_Order(QDataStream &_stream_tcp_ip)
+{
+
+}
+
+void MainWindow::AnswerToKey_List(QDataStream &_stream_tcp_ip)
+{
+
 }
 

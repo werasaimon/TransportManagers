@@ -9,6 +9,10 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    Common/help_func.hpp
+    Common/help_func.hpp \
+    Common/order.h
+
+SOURCES += \
+    Common/order.cpp
 
 

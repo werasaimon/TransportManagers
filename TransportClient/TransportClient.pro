@@ -12,6 +12,7 @@ TARGET = TransportClient
 SOURCES += \
     ../Common/blockreader.cpp \
     ../Common/blockwriter.cpp \
+    ../Common/order.cpp \
     ../Common/qjsontablemodel.cpp \
     main.cpp \
     mainwindow.cpp
@@ -20,6 +21,7 @@ HEADERS += \
     ../Common/blockreader.h \
     ../Common/blockwriter.h \
     ../Common/help_func.hpp \
+    ../Common/order.h \
     ../Common/qjsontablemodel.h \
     mainwindow.h
 
