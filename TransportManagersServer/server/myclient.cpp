@@ -172,7 +172,7 @@ void MyClient::AnswerToKey_User(QDataStream &_stream_tcp_ip)
     }
 
 
-     int i_cid = m_Query->record().indexOf("ID");
+    int i_cid = m_Query->record().indexOf("ID");
     int counter = 0;
     while (m_Query->next())
     {
@@ -211,25 +211,137 @@ void MyClient::AnswerToKey_Order(QDataStream &_stream_tcp_ip)
 
 
 
+    m_Query->prepare("SELECT ID_Oreder FROM fulfill WHERE Username = :username AND ID_Oreder = :id AND Data = :data");
+    m_Query->bindValue(":id", _order.ID);
+    m_Query->bindValue(":username", _order.Username);
+    m_Query->bindValue(":data", _order.Data);
+    m_Query->exec();
+
+//    if(!m_Query->isActive())
+//    {
+//        qDebug() << ("SQL Statement execution failed");
+//        return;
+//    }
+
+    while (m_Query->next())
+    {
+        qDebug() << ("SQL While");
+        return;
+    }
+
+
     qDebug() << "ID: " << _order.ID;
     qDebug() << "Text: " << _order.Text;
     qDebug() << "Data: " << _order.Data;
     qDebug() << "Username: " << _order.Username;
 
 
-    m_Query->prepare("INSERT INTO fulfill (ID , Username, Text, Data, ID_Oreder) "
-                     "VALUES (:ID, :Username, :Text, :Data, :ID_Oreder)");
+    m_Query->prepare("INSERT INTO fulfill (ID_Oreder, Username, Text, Data ) "
+                     "VALUES (:ID_Oreder, :Username, :Text, :Data )");
 
+
+
+
+    m_Query->bindValue(":ID_Oreder", _order.ID);
     m_Query->bindValue(":Username", _order.Username);
     m_Query->bindValue(":Text", _order.Text);
     m_Query->bindValue(":Data", _order.Data);
-    m_Query->bindValue(":ID_Oreder", _order.ID);
 
+
+
+//    if(m_Query->isActive())
+//    {
+//        qDebug() << ("SQL Statement execution failed");
+//        return;
+//    }
+
+//    while (m_Query->next())
+//    {
+//        return;
+//    }
+
+
+    int i_cid = m_Query->record().indexOf("ID_Oreder");
+    int counter = 0;
+    while (m_Query->next())
+    {
+        counter++;
+        qDebug() << m_Query->value(i_cid).toInt();
+    }
+
+    if(counter == 0)
     m_Query->exec();
 }
 
 void MyClient::AnswerToKey_List(QDataStream &_stream_tcp_ip)
 {
+
+    qDebug() << " WeraSuka-------------------------WeraSuka ";
+
+     QString sql;
+    _stream_tcp_ip >> sql;
+
+    if(!m_Query->exec("SELECT * FROM preorders"))
+    {
+        qDebug() << m_Query->lastError().databaseText();
+        qDebug() << m_Query->lastError().driverText();
+
+        QString key = "error";
+        BlockWriter* bw = new BlockWriter(socket);
+        bw->stream() << key;
+        bw->stream() << m_Query->lastError().databaseText();
+        bw->stream() << m_Query->lastError().driverText();
+        delete bw;
+
+        return;
+
+    }
+    else
+    {
+
+         QVector<Order> List;
+
+         int i_cid   = m_Query->record().indexOf("ID");
+         int i_ctext = m_Query->record().indexOf("Text");
+         int i_cdata = m_Query->record().indexOf("Data");
+
+         while (m_Query->next())
+         {
+             int ID = m_Query->value(i_cid).toInt();
+             QString Text = m_Query->value(i_ctext).toString();
+             QString Data = m_Query->value(i_cdata).toString();
+
+
+             Order order;
+             order.ID = ID;
+             order.Text = Text;
+             order.Data = Data;
+
+             List.push_back(order);
+
+            qDebug() << "<<<<<<<<<<<<<" << ID <<">>>>>>>>>>>" << Text;
+         }
+
+
+
+         QString key = "list";
+         BlockWriter* bw = new BlockWriter(socket);
+         bw->stream() << key;// << List;
+         bw->stream() << List.size();
+
+         for(int i=0;i<List.size();++i)
+         {
+             bw->stream() << List[i].ID;
+             bw->stream() << List[i].Text;
+             bw->stream() << List[i].Data;
+         }
+
+         delete bw;
+
+
+
+    }
+
 
 }
 

@@ -11,6 +11,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    this->setWindowTitle( "Meneger Server" );
 //    db = QSqlDatabase::addDatabase("QMYSQL");
 //    db.setHostName("127.0.0.1");
 //    db.setDatabaseName("wera");
@@ -42,7 +43,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
         QString quary3 = "CREATE TABLE fulfill ("
-                         "ID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,"
+                         //"ID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,"
                          "ID_Oreder INTEGER,"
                          "Username VARCHAR(255),"
                          "Text VARCHAR(255),"
