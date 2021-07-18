@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QTcpSocket>
+#include <QMap>
+#include <QListWidgetItem>
 #include "../Common/qjsontablemodel.h"
 #include "../Common/order.h"
 
@@ -37,11 +39,19 @@ private slots:
 //    void sendSomething();
 //    void on_pushButton_A_clicked();
 
+    void on_pushButton_List_clicked();
+    void showContextMenu(const QPoint &pos);
+    void SendItem();
+
 private:
     Ui::MainWindow *ui;
     QTcpSocket  *m_TCPSocket = nullptr;
+    //--------------------------------------//
 
     QJsonTableModel* episodes;
+
+    //--------------------------------------//
+    QMap<QListWidgetItem*, Order> mMapOrders;
 
     bool isConnected = false;
 

@@ -23,6 +23,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    this->setWindowTitle( "Meneger Client" );
+
     QJsonTableModel::Header header;
     header.push_back( QJsonTableModel::Heading( { {"title","ID"},   {"index","ID"} }) );
     header.push_back( QJsonTableModel::Heading( { {"title","Text"}, {"index","Text"} }) );
@@ -38,6 +40,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_TCPSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(displayError(QAbstractSocket::SocketError)));
     connect(m_TCPSocket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
     connect(m_TCPSocket, SIGNAL(disconnected()), m_TCPSocket, SLOT(sockDisc()));
+
+    //-------------------------------------------------------//
+
+    ui->listWidget_A->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->listWidget_A, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showContextMenu(QPoint)));
 
 }
 
@@ -139,13 +146,13 @@ void MainWindow::on_pushButton_2_clicked()
 
         //-----------------------------------------------------//
 
-        QAbstractItemModel* mdl = ui->tableView->model();
-        mdl->removeRows(0,mdl->rowCount());
-        mdl->removeColumns(0,mdl->columnCount());
+//        QAbstractItemModel* mdl = ui->tableView->model();
+//        mdl->removeRows(0,mdl->rowCount());
+//        mdl->removeColumns(0,mdl->columnCount());
 
 
 
-        ui->tableView->setModel(nullptr);
+//        ui->tableView->setModel(nullptr);
 
         //-----------------------------------------------------//
 
@@ -336,7 +343,7 @@ void MainWindow::AnswerToKey_SQL(QDataStream &_stream_tcp_ip)
     QJsonParseError parseError;
     QJsonDocument doc = QJsonDocument::fromJson(datas, &parseError);
     episodes->setJson( doc );
-    ui->tableView->setModel(episodes);
+    //ui->tableView->setModel(episodes);
 
     if(parseError.error ==  QJsonParseError::NoError)
     {
@@ -381,5 +388,112 @@ void MainWindow::AnswerToKey_Order(QDataStream &_stream_tcp_ip)
 void MainWindow::AnswerToKey_List(QDataStream &_stream_tcp_ip)
 {
 
+    int size;
+    _stream_tcp_ip >> size;
+
+    mMapOrders.clear();
+    ui->listWidget_A->clear();
+    for(int i=0;i<size;++i)
+    {
+        Order _Order;
+
+        _stream_tcp_ip >> _Order.ID;
+        _stream_tcp_ip >> _Order.Text;
+        _stream_tcp_ip >> _Order.Data;
+
+
+        //-----------------------------------------//
+        auto itemN = new QListWidgetItem;
+        auto widget = new QWidget();
+
+        QFrame *line = new QFrame(widget);
+        line->setFrameShape(QFrame::HLine);
+        line->setFrameShadow(QFrame::Sunken);
+
+        auto widgetText =  new QLabel("ID: " + QString::number(_Order.ID) + "\n" +
+                                      "Data: " + _Order.Data + "\n" +
+                                      "Text: " + _Order.Text + "\n");
+        widgetText->setStyleSheet("background-color: rgb(200, 200, 200);");
+
+        auto widgetLayout = new QVBoxLayout();
+
+        widgetLayout->addStretch(1);
+        widgetLayout->addWidget(widgetText);
+
+        widgetLayout->addWidget(line);
+        widgetLayout->addStretch(5);
+
+        widgetLayout->setSizeConstraint(QLayout::SetFixedSize);
+        widgetLayout->setAlignment(Qt::AlignTop);
+
+        widget->setLayout(widgetLayout);
+        itemN->setSizeHint(widget->sizeHint());
+
+        ui->listWidget_A->addItem(itemN);
+        ui->listWidget_A->setItemWidget(itemN, widget);
+         //-------------------------------------//
+
+        mMapOrders[itemN] = _Order;
+
+        qDebug() << _Order.ID << _Order.Text << _Order.Data;
+    }
+}
+
+
+void MainWindow::on_pushButton_List_clicked()
+{
+    QByteArray  SQL_Edit = ui->lineEdit_command_sql_send->text().toUtf8();
+    QString key = "list";
+    QString sql = "SELECT * FROM preorders;";
+    BlockWriter* bw = new BlockWriter(m_TCPSocket);
+    bw->stream() << key << sql;
+    delete bw;
+}
+
+
+
+
+void MainWindow::showContextMenu(const QPoint &pos)
+{
+        // Handle global position
+        QPoint globalPos = ui->listWidget_A->mapToGlobal(pos);
+
+        // Create menu and insert some actions
+        QMenu myMenu;
+        myMenu.addAction("Я Хочу Выполнить", this, SLOT(SendItem()));
+        //myMenu.addAction("Erase",  this, SLOT(eraseItem()));
+
+        // Show context menu at handling position
+        myMenu.exec(globalPos);
+}
+
+void MainWindow::SendItem()
+{
+
+    // If multiple selection is on, we need to erase all selected items
+    for (int i = 0; i < ui->listWidget_A->selectedItems().size(); ++i)
+    {
+        // Get curent item on selected row
+        QListWidgetItem *item = ui->listWidget_A->takeItem(ui->listWidget_A->currentRow());
+        Order _order = mMapOrders[item];
+       _order.Username = ui->lineEdit_username->text();
+
+        //---------------------------------------------//
+
+        BlockWriter* bw = new BlockWriter(m_TCPSocket);
+
+        QString key = "order";
+        bw->stream() << key;
+
+        bw->stream() << _order.ID;
+        bw->stream() << _order.Text;
+        bw->stream() << _order.Data;
+        bw->stream() << _order.Username;
+
+        delete bw;
+
+        // And remove it
+        //delete item;
+    }
 }
 
