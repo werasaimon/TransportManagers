@@ -15,6 +15,8 @@ SOURCES += \
     ../Common/order.cpp \
     ../Common/qjsontablemodel.cpp \
     dialogaddclient.cpp \
+    dialogaddpreorder.cpp \
+    dialogaddproduct.cpp \
     dialogrecorteditform.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -29,7 +31,10 @@ HEADERS += \
     ../Common/help_func.hpp \
     ../Common/order.h \
     ../Common/qjsontablemodel.h \
+    ../Common/qoperators.hpp \
     dialogaddclient.h \
+    dialogaddpreorder.h \
+    dialogaddproduct.h \
     dialogrecorteditform.h \
     mainwindow.h \
     server/myclient.h \
@@ -39,6 +44,8 @@ HEADERS += \
 
 FORMS += \
     dialogaddclient.ui \
+    dialogaddpreorder.ui \
+    dialogaddproduct.ui \
     dialogrecorteditform.ui \
     mainwindow.ui
 

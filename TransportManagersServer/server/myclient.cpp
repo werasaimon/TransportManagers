@@ -7,10 +7,13 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
+
 #include "../Common/blockreader.h"
 #include "../Common/blockwriter.h"
 #include "../Common/help_func.hpp"
 #include "../Common/order.h"
+#include "../Common/qoperators.hpp"
+
 
 
 MyClient::MyClient(QObject *parent) :
@@ -91,12 +94,15 @@ void MyClient::TaskResult(QTcpSocket* socket)
     BlockReader br(socket);
     br.stream() >> key;
 
+    // fulfillment order list
+
     switch(const_hash(key.toStdString().c_str()))
     {
         case const_hash("sql"):  AnswerToKey_SQL(br.stream()); break;
         case const_hash("user"): AnswerToKey_User(br.stream()); break;
         case const_hash("order"): AnswerToKey_Order(br.stream()); break;
         case const_hash("list"): AnswerToKey_List(br.stream()); break;
+        case const_hash("fulfillment"): AnswerToKey_fulfillment(br.stream()); break;
     }
 }
 
@@ -211,23 +217,23 @@ void MyClient::AnswerToKey_Order(QDataStream &_stream_tcp_ip)
 
 
 
-    m_Query->prepare("SELECT ID_Oreder FROM fulfill WHERE Username = :username AND ID_Oreder = :id AND Data = :data");
-    m_Query->bindValue(":id", _order.ID);
-    m_Query->bindValue(":username", _order.Username);
-    m_Query->bindValue(":data", _order.Data);
-    m_Query->exec();
+//    m_Query->prepare("SELECT ID_Oreder FROM fulfill WHERE Username = :username AND ID_Oreder = :id AND Data = :data");
+//    m_Query->bindValue(":id", _order.ID);
+//    m_Query->bindValue(":username", _order.Username);
+//    m_Query->bindValue(":data", _order.Data);
+//    m_Query->exec();
 
-//    if(!m_Query->isActive())
+////    if(!m_Query->isActive())
+////    {
+////        qDebug() << ("SQL Statement execution failed");
+////        return;
+////    }
+
+//    while (m_Query->next())
 //    {
-//        qDebug() << ("SQL Statement execution failed");
+//        qDebug() << ("SQL While");
 //        return;
 //    }
-
-    while (m_Query->next())
-    {
-        qDebug() << ("SQL While");
-        return;
-    }
 
 
     qDebug() << "ID: " << _order.ID;
@@ -275,13 +281,10 @@ void MyClient::AnswerToKey_Order(QDataStream &_stream_tcp_ip)
 
 void MyClient::AnswerToKey_List(QDataStream &_stream_tcp_ip)
 {
-
-    qDebug() << " WeraSuka-------------------------WeraSuka ";
-
      QString sql;
     _stream_tcp_ip >> sql;
 
-    if(!m_Query->exec("SELECT * FROM preorders"))
+    if(!m_Query->exec("SELECT * FROM preorders WHERE Username IS NULL OR Username = '' "))
     {
         qDebug() << m_Query->lastError().databaseText();
         qDebug() << m_Query->lastError().driverText();
@@ -303,23 +306,40 @@ void MyClient::AnswerToKey_List(QDataStream &_stream_tcp_ip)
 
          int i_cid   = m_Query->record().indexOf("ID");
          int i_ctext = m_Query->record().indexOf("Text");
-         int i_cdata = m_Query->record().indexOf("Data");
+         int i_cdate = m_Query->record().indexOf("Date");
+         int i_cweight = m_Query->record().indexOf("Weight");
+         int i_caddress = m_Query->record().indexOf("Address");
+         int i_cproduct = m_Query->record().indexOf("Product");
+         int i_cstatus = m_Query->record().indexOf("Status");
 
          while (m_Query->next())
          {
              int ID = m_Query->value(i_cid).toInt();
              QString Text = m_Query->value(i_ctext).toString();
-             QString Data = m_Query->value(i_cdata).toString();
+             QString Data = m_Query->value(i_cdate).toString();
+             int Weight = m_Query->value(i_cweight).toInt();
+             QString Address = m_Query->value(i_caddress).toString();
+             QString Product = m_Query->value(i_cproduct).toString();
+             QString Status = m_Query->value(i_cstatus).toString();
 
 
              Order order;
              order.ID = ID;
              order.Text = Text;
              order.Data = Data;
+             order.Weight = Weight;
+             order.Address = Address;
+             order.Product = Product;
+             order.Status = Status;
 
              List.push_back(order);
 
-            qDebug() << "<<<<<<<<<<<<<" << ID <<">>>>>>>>>>>" << Text;
+//            qDebug() << "ID: " << ID <<
+//                        "Text: " << Text <<
+//                        " Data: " << order.Data <<
+//                        " Weight: " << order.Weight <<
+//                        " Product: " << order.Product <<
+//                        " Address: " << order.Address;
          }
 
 
@@ -331,9 +351,23 @@ void MyClient::AnswerToKey_List(QDataStream &_stream_tcp_ip)
 
          for(int i=0;i<List.size();++i)
          {
-             bw->stream() << List[i].ID;
-             bw->stream() << List[i].Text;
-             bw->stream() << List[i].Data;
+            bw->stream() << List[i];
+
+//            bw->stream() << List[i].ID;
+//            bw->stream() << List[i].Text;
+//            bw->stream() << List[i].Data;
+//            bw->stream() << List[i].Username;
+//            bw->stream() << List[i].Weight;
+//            bw->stream() << List[i].Address;
+//            bw->stream() << List[i].Product;
+
+            qDebug() << "ID: " << List[i].ID <<
+                        "Text: " << List[i].Text <<
+                        " Data: " << List[i].Data <<
+                        " Username: " << List[i].Username <<
+                        " Weight: " << List[i].Weight <<
+                        " Product: " << List[i].Product <<
+                        " Address: " << List[i].Address;
          }
 
          delete bw;
@@ -342,6 +376,115 @@ void MyClient::AnswerToKey_List(QDataStream &_stream_tcp_ip)
 
     }
 
+
+}
+
+void MyClient::AnswerToKey_fulfillment(QDataStream &_stream_tcp_ip)
+{
+    QString username;
+    _stream_tcp_ip >> username;
+
+    qDebug() << username;
+
+    m_Query->prepare("SELECT * FROM preorders WHERE Username = :username ");
+    m_Query->bindValue(":username", username);
+
+    if(!m_Query->exec())
+    {
+        qDebug() << m_Query->lastError().databaseText();
+        qDebug() << m_Query->lastError().driverText();
+
+        QString key = "error";
+        BlockWriter* bw = new BlockWriter(socket);
+        bw->stream() << key;
+        bw->stream() << m_Query->lastError().databaseText();
+        bw->stream() << m_Query->lastError().driverText();
+        delete bw;
+
+        return;
+
+    }
+    else
+    {
+
+         QVector<Order> List;
+
+         int i_cid   = m_Query->record().indexOf("ID");
+         int i_ctext = m_Query->record().indexOf("Text");
+         int i_cdate = m_Query->record().indexOf("Date");
+         int i_cusername = m_Query->record().indexOf("Username");
+         int i_cweight = m_Query->record().indexOf("Weight");
+         int i_caddress = m_Query->record().indexOf("Address");
+         int i_cproduct = m_Query->record().indexOf("Product");
+         int i_cstatus = m_Query->record().indexOf("Status");
+
+         while (m_Query->next())
+         {
+             int ID = m_Query->value(i_cid).toInt();
+             QString Text = m_Query->value(i_ctext).toString();
+             QString Data = m_Query->value(i_cdate).toString();
+             QString UserName = m_Query->value(i_cusername).toString();
+             int Weight = m_Query->value(i_cweight).toInt();
+             QString Address = m_Query->value(i_caddress).toString();
+             QString Product = m_Query->value(i_cproduct).toString();
+             QString Status = m_Query->value(i_cstatus).toString();
+
+
+             Order order;
+             order.ID = ID;
+             order.Text = Text;
+             order.Data = Data;
+             order.Username = UserName;
+             order.Weight = Weight;
+             order.Address = Address;
+             order.Product = Product;
+             order.Status = Status;
+
+             List.push_back(order);
+
+
+             qDebug() << "ID: " << ID <<
+                         "Text: " << Text <<
+                         " Data: " << order.Data <<
+                         " Username: " << order.Username <<
+                         " Weight: " << order.Weight <<
+                         " Product: " << order.Product <<
+                         " Address: " << order.Address;
+
+           // qDebug() << "<<<<<<<<<<<<<" << ID <<">>>>>>>>>>>" << Text << " Data: " << order.Data << " Username: " << order.Username;
+         }
+
+
+         BlockWriter* bw = new BlockWriter(socket);
+
+         QString key = "fulfillment";
+         bw->stream() << key;// << List;
+         bw->stream() << List.size();
+
+         for(int i=0;i<List.size();++i)
+         {
+            bw->stream() << List[i];
+
+//            bw->stream() << List[i].ID;
+//            bw->stream() << List[i].Text;
+//            bw->stream() << List[i].Data;
+//            bw->stream() << List[i].Username;
+//            bw->stream() << List[i].Weight;
+//            bw->stream() << List[i].Address;
+
+             //qDebug() <<  " Data: " << List[i].Data;
+
+            qDebug() << "ID: " << List[i].ID <<
+                        "Text: " << List[i].Text <<
+                        " Data: " << List[i].Data <<
+                        " Username: " << List[i].Username <<
+                        " Weight: " << List[i].Weight <<
+                        " Product: " << List[i].Product <<
+                        " Address: " << List[i].Address;
+         }
+
+         delete bw;
+    }
 
 }
 

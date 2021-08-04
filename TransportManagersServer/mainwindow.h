@@ -7,6 +7,8 @@
 #include <QSqlTableModel>
 #include "dialogrecorteditform.h"
 #include "dialogaddclient.h"
+#include "dialogaddpreorder.h"
+#include "dialogaddproduct.h"
 
 #include "server/myserver.h"
 
@@ -54,8 +56,12 @@ private slots:
     void on_tableView_doubleClicked(const QModelIndex &index);
 
     void on_pushButton_7_clicked();
+    void on_pushButton_8_clicked();
 
-    void on_pushButton_ttt_clicked();
+    void on_pushButton_AddUser_clicked();
+    void on_pushButton_Preorder_clicked();
+
+    void on_pushButton_AddProduct_clicked();
 
 private:
 
@@ -63,7 +69,9 @@ private:
     Ui::MainWindow *ui;
 
     DialogRecortEditForm *EditForm;
-    DialogAddClient *m_AddClientWidget;
+    DialogAddClient   *m_AddClientWidget;
+    Dialogaddpreorder *m_AddPreorderWidget;
+    Dialogaddproduct  *m_AddProductWidget;
 
     //--------------------------------//
 
@@ -71,7 +79,7 @@ private:
     QSqlTableModel2 *t_model;
 
     // Create an instance of a server.
-    MyServer *m_Server;
+    MyServer *m_Server = nullptr;
     QSqlQuery *m_Query;
 };
 #endif // MAINWINDOW_H
