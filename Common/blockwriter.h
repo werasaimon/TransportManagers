@@ -4,6 +4,7 @@
 #include <QBuffer>
 #include <QDataStream>
 #include <QIODevice>
+#include "order.h"
 
 class BlockWriter
 {
@@ -22,4 +23,8 @@ private:
     QDataStream _stream;
     QIODevice *io;
 };
+
+
+
+
 #endif // BLOCKWRITER_H

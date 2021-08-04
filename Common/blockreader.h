@@ -4,6 +4,7 @@
 #include <QBuffer>
 #include <QDataStream>
 #include <QIODevice>
+#include "order.h"
 
 class BlockReader
 {
@@ -24,5 +25,7 @@ private:
     QBuffer buffer;
     QDataStream _stream;
 };
+
+
 
 #endif // BLOCKREADER_H

@@ -30,4 +30,29 @@ private:
     QJsonArray m_json;
 };
 
+
+//#include <QDataStream>
+//#include "order.h"
+
+
+//QDataStream &operator<<(QDataStream &lhs, const Order &rhs)
+//{
+//    lhs << rhs.ID;
+//    lhs << rhs.Text;
+//    lhs << rhs.Data;
+//    lhs << rhs.Username;
+//    lhs << rhs.Weight;
+//    lhs << rhs.Address;
+//}
+
+//QDataStream &operator>>(QDataStream &lhs, Order &rhs)
+//{
+//    lhs >> rhs.ID;
+//    lhs >> rhs.Text;
+//    lhs >> rhs.Data;
+//    lhs >> rhs.Username;
+//    lhs >> rhs.Weight;
+//    lhs >> rhs.Address;
+//}
+
 #endif // QJSONTABLEMODEL_H
