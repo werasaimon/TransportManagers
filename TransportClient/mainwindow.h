@@ -43,6 +43,8 @@ private slots:
     void showContextMenu(const QPoint &pos);
     void SendItem();
 
+    void on_pushButton_fulfillment_clicked();
+
 private:
     Ui::MainWindow *ui;
     QTcpSocket  *m_TCPSocket = nullptr;
@@ -59,5 +61,6 @@ private:
     void AnswerToKey_User(QDataStream &_stream_tcp_ip);
     void AnswerToKey_Order(QDataStream &_stream_tcp_ip);
     void AnswerToKey_List(QDataStream &_stream_tcp_ip);
+    void AnswerToKey_fulfillment(QDataStream &_stream_tcp_ip);
 };
 #endif // MAINWINDOW_H

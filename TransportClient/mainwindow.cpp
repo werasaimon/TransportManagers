@@ -16,6 +16,9 @@
 #include "../Common/blockreader.h"
 #include "../Common/blockwriter.h"
 #include "../Common/help_func.hpp"
+#include "../Common/qoperators.hpp"
+
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -46,6 +49,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui->listWidget_A->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->listWidget_A, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showContextMenu(QPoint)));
 
+    //-------------------------------------------------------//
+
+    connect(ui->pushButton_ExtudeAnOreder, SIGNAL(clicked()), this, SLOT(SendItem()));
+
 }
 
 
@@ -72,13 +79,14 @@ void MainWindow::onReadyRead()
             case const_hash("user"): AnswerToKey_User(br.stream()); break;
             case const_hash("order"): AnswerToKey_Order(br.stream()); break;
             case const_hash("list"): AnswerToKey_List(br.stream()); break;
+            case const_hash("fulfillment"): AnswerToKey_fulfillment(br.stream()); break;
         }
 
 
         //ui->textEdit->setHtml(ui->textEdit->toHtml() + s.toUtf8() + "<br>");
-        ui->textEdit->setHtml(ui->textEdit->toHtml() + key.toUtf8() + "<br>");
+        //ui->textEdit->setHtml(ui->textEdit->toHtml() + key.toUtf8() + "<br>");
         //ui->textEdit->setHtml(ui->textEdit->toHtml() + QString::fromUtf8(datas).toUtf8() + "<br>");
-        ui->textEdit->verticalScrollBar()->setSliderPosition(ui->textEdit->verticalScrollBar()->maximum());
+       // ui->textEdit->verticalScrollBar()->setSliderPosition(ui->textEdit->verticalScrollBar()->maximum());
 
 
     }
@@ -95,7 +103,7 @@ void MainWindow::on_pushButton_clicked()
 {
     if(!m_TCPSocket || (m_TCPSocket->state() != QTcpSocket::ConnectedState)) return;
 
-    QByteArray  SQL_Edit = ui->lineEdit_command_sql_send->text().toUtf8();
+    QByteArray  SQL_Edit = "SELECT * FROM preorders LIMIT 2";//ui->lineEdit_command_sql_send->text().toUtf8();
     QString key = "sql";
     BlockWriter* bw = new BlockWriter(m_TCPSocket);
     bw->stream() << key << SQL_Edit;
@@ -158,6 +166,7 @@ void MainWindow::on_pushButton_2_clicked()
 
         isConnected = false;
         ui->pushButton_2->setText("Connected");
+        ui->listWidget_A->clear();
     }
 
 }
@@ -395,12 +404,16 @@ void MainWindow::AnswerToKey_List(QDataStream &_stream_tcp_ip)
     ui->listWidget_A->clear();
     for(int i=0;i<size;++i)
     {
-        Order _Order;
+         Order _Order;
+        _stream_tcp_ip >> _Order;
 
-        _stream_tcp_ip >> _Order.ID;
-        _stream_tcp_ip >> _Order.Text;
-        _stream_tcp_ip >> _Order.Data;
-
+//         _stream_tcp_ip >> _Order.ID;
+//         _stream_tcp_ip >> _Order.Text;
+//         _stream_tcp_ip >> _Order.Data;
+//         _stream_tcp_ip >> _Order.Username;
+//         _stream_tcp_ip >> _Order.Weight;
+//         _stream_tcp_ip >> _Order.Address;
+//         _stream_tcp_ip >> _Order.Product;
 
         //-----------------------------------------//
         auto itemN = new QListWidgetItem;
@@ -412,7 +425,11 @@ void MainWindow::AnswerToKey_List(QDataStream &_stream_tcp_ip)
 
         auto widgetText =  new QLabel("ID: " + QString::number(_Order.ID) + "\n" +
                                       "Data: " + _Order.Data + "\n" +
+                                      "Weight: " + QString::number(_Order.Weight) + "\n" +
+                                      "Address: " + _Order.Address + "\n" +
+                                      "Product: " + _Order.Product + "\n" +
                                       "Text: " + _Order.Text + "\n");
+
         widgetText->setStyleSheet("background-color: rgb(200, 200, 200);");
 
         auto widgetLayout = new QVBoxLayout();
@@ -435,19 +452,109 @@ void MainWindow::AnswerToKey_List(QDataStream &_stream_tcp_ip)
 
         mMapOrders[itemN] = _Order;
 
-        qDebug() << _Order.ID << _Order.Text << _Order.Data;
+//        mMapOrders[itemN].ID = _Order.ID;
+//        mMapOrders[itemN].Text = _Order.Text;
+//        mMapOrders[itemN].Data = _Order.Data;
+//        mMapOrders[itemN].Weight = _Order.Weight;
+//        mMapOrders[itemN].Address = _Order.Address;
+
+        qDebug() << _Order.ID << _Order.Text << _Order.Data << _Order.Username << _Order.Address << _Order.Product;
+    }
+}
+
+void MainWindow::AnswerToKey_fulfillment(QDataStream &_stream_tcp_ip)
+{
+
+    int size;
+    _stream_tcp_ip >> size;
+
+    mMapOrders.clear();
+    ui->listWidget_A->clear();
+    for(int i=0;i<size;++i)
+    {
+        Order _Order;
+       _stream_tcp_ip >> _Order;
+
+//        _stream_tcp_ip >> _Order.ID;
+//        _stream_tcp_ip >> _Order.Text;
+//        _stream_tcp_ip >> _Order.Data;
+//        _stream_tcp_ip >> _Order.Username;
+//        _stream_tcp_ip >> _Order.Weight;
+//        _stream_tcp_ip >> _Order.Address;
+
+        //-----------------------------------------//
+        auto itemN = new QListWidgetItem;
+        auto widget = new QWidget();
+
+        QFrame *line = new QFrame(widget);
+        line->setFrameShape(QFrame::HLine);
+        line->setFrameShadow(QFrame::Sunken);
+
+        auto widgetText =  new QLabel("Status: " + _Order.Status + "\n" +
+                                      "ID: " + QString::number(_Order.ID) + "\n" +
+                                      "Data: " + _Order.Data + "\n" +
+                                      "Weight: " + QString::number(_Order.Weight) + "\n" +
+                                      "Address: " + _Order.Address + "\n" +
+                                      "Executor: " + _Order.Username + "\n" +
+                                      "Product: " + _Order.Product + "\n" +
+                                      "Text: " + _Order.Text + "\n" );
+
+
+         if(_Order.Status == QString("Final"))
+         {
+             widgetText->setStyleSheet("background-color: rgb(20, 250, 20);"
+                                       "font-size: 24px;");
+         }
+         else
+         {
+             widgetText->setStyleSheet("background-color: rgb(250, 20, 20);"
+                                       "font-size: 24px;");
+         }
+
+
+
+        auto widgetLayout = new QVBoxLayout();
+
+        widgetLayout->addStretch(1);
+        widgetLayout->addWidget(widgetText);
+
+        widgetLayout->addWidget(line);
+        widgetLayout->addStretch(5);
+
+        widgetLayout->setSizeConstraint(QLayout::SetFixedSize);
+        widgetLayout->setAlignment(Qt::AlignTop);
+
+        widget->setLayout(widgetLayout);
+        itemN->setSizeHint(widget->sizeHint());
+
+        ui->listWidget_A->addItem(itemN);
+        ui->listWidget_A->setItemWidget(itemN, widget);
+         //-------------------------------------//
+
+        mMapOrders[itemN] = _Order;
+
+//        mMapOrders[itemN].ID = _Order.ID;
+//        mMapOrders[itemN].Text = _Order.Text;
+//        mMapOrders[itemN].Data = _Order.Data;
+//        mMapOrders[itemN].Username = _Order.Username;
+//        mMapOrders[itemN].Weight = _Order.Weight;
+//        mMapOrders[itemN].Address = _Order.Address;
+
+        qDebug() << _Order.ID << _Order.Text << _Order.Data << _Order.Username << _Order.Address << _Order.Product << _Order.Status;
     }
 }
 
 
 void MainWindow::on_pushButton_List_clicked()
 {
-    QByteArray  SQL_Edit = ui->lineEdit_command_sql_send->text().toUtf8();
+    QByteArray  SQL_Edit = "SELECT * FROM preorders LIMIT 2";//ui->lineEdit_command_sql_send->text().toUtf8();
     QString key = "list";
     QString sql = "SELECT * FROM preorders;";
     BlockWriter* bw = new BlockWriter(m_TCPSocket);
     bw->stream() << key << sql;
     delete bw;
+
+    ui->pushButton_ExtudeAnOreder->setEnabled(true);
 }
 
 
@@ -456,15 +563,15 @@ void MainWindow::on_pushButton_List_clicked()
 void MainWindow::showContextMenu(const QPoint &pos)
 {
         // Handle global position
-        QPoint globalPos = ui->listWidget_A->mapToGlobal(pos);
+        //QPoint globalPos = ui->listWidget_A->mapToGlobal(pos);
 
         // Create menu and insert some actions
-        QMenu myMenu;
-        myMenu.addAction("Я Хочу Выполнить", this, SLOT(SendItem()));
+        //QMenu myMenu;
+        //myMenu.addAction("Я Хочу Выполнить", this, SLOT(SendItem()));
         //myMenu.addAction("Erase",  this, SLOT(eraseItem()));
 
         // Show context menu at handling position
-        myMenu.exec(globalPos);
+        //myMenu.exec(globalPos);
 }
 
 void MainWindow::SendItem()
@@ -476,7 +583,11 @@ void MainWindow::SendItem()
         // Get curent item on selected row
         QListWidgetItem *item = ui->listWidget_A->takeItem(ui->listWidget_A->currentRow());
         Order _order = mMapOrders[item];
-       _order.Username = ui->lineEdit_username->text();
+        _order.Username = ui->lineEdit_username->text();
+        _order.Data = _order.Data;
+
+
+        qDebug() << "DDDDAATTEE: " << _order.Data;
 
         //---------------------------------------------//
 
@@ -494,6 +605,25 @@ void MainWindow::SendItem()
 
         // And remove it
         //delete item;
+    }
+}
+
+
+void MainWindow::on_pushButton_fulfillment_clicked()
+{
+    if(m_TCPSocket->state() == QTcpSocket::ConnectedState)
+    {
+        QString key = "fulfillment";
+        BlockWriter* bw = new BlockWriter(m_TCPSocket);
+        bw->stream() << key;
+
+        QString username = ui->lineEdit_username->text();
+        bw->stream() << username;
+        //bw->stream() << password;
+
+        ui->pushButton_ExtudeAnOreder->setEnabled(false);
+
+        delete bw;
     }
 }
 

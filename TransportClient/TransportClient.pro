@@ -23,6 +23,7 @@ HEADERS += \
     ../Common/help_func.hpp \
     ../Common/order.h \
     ../Common/qjsontablemodel.h \
+    ../Common/qoperators.hpp \
     mainwindow.h
 
 FORMS += \
