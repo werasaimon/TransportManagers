@@ -12,6 +12,8 @@ Dialogaddpreorder::Dialogaddpreorder(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->dateEdit->setCalendarPopup(true);
+
 //   QObject::connect(ui->comboBox_NameProducts, SIGNAL(activated(QString)), this, SLOT(on_FindPorodutsInCombobox()));
 
 //    m_Query->prepare("SELECT * FROM fulfill WHERE ID_Oreder = :id ");
@@ -74,19 +76,42 @@ void Dialogaddpreorder::on_pushButton_Add_clicked()
     //qDebug() << "||| " << ui->dateEdit->dateTime().toString("yyyy-MM-dd");
 
     int Weight = ui->spinBox_Weight->value();
+    QString text = ui->textEdit->toPlainText();
     QString date = ui->dateEdit->dateTime().toString("yyyy-MM-dd");
     QString address = ui->lineEdit_Address->text();
     QString product = ui->comboBox_NameProducts->currentText();
 
-    m_Query->prepare("INSERT INTO preorders (ID, Text, Date, Weight, Address, Product) "
-                     "VALUES (:ID, :Text, :Date, :Weight, :Address, :Product)");
+
+    //------------------------------------------------------//
+    m_Query->prepare("INSERT INTO preorders (ID,Text,Date,Weight,Address,Product,Status) "
+                     "VALUES (:ID, :Text, :Date, :Weight, :Address, :Product, :Status)");
+
+    m_Query->bindValue(":Text", text);
+    m_Query->bindValue(":Date", date);
+   // m_Query->bindValue(":Username", "");
+    m_Query->bindValue(":Weight", Weight);
+    m_Query->bindValue(":Address", address );
+    m_Query->bindValue(":Product", product );
+    m_Query->bindValue(":Status", "Waiting" );
+   // m_Query->bindValue(":ID", 1001);
+
+    if(!m_Query->exec())
+    {
+        qDebug() << m_Query->lastError().databaseText();
+        qDebug() << m_Query->lastError().driverText();
+    }
+    //------------------------------------------------------//
+
+
+   //m_Query->prepare("INSERT INTO preorders (ID, Text, Date, Weight, Address, Product) "
+     //                "VALUES (:ID, :Text, :Date, :Weight, :Address, :Product)");
     //m_Query->bindValue(":ID", 1001);
-    m_Query->bindValue(":Text",ui->textEdit->toPlainText());
-    m_Query->bindValue(":Date",date);
-    m_Query->bindValue(":Weight",Weight);
-    m_Query->bindValue(":Address",address);
-    m_Query->bindValue(":Product",product);
-    m_Query->exec();
+   // m_Query->bindValue(":Text",ui->textEdit->toPlainText());
+   // m_Query->bindValue(":Date",date);
+   // m_Query->bindValue(":Weight",Weight);
+   // m_Query->bindValue(":Address",address);
+   // m_Query->bindValue(":Product",product);
+    //m_Query->exec();
     close();
 }
 
@@ -96,5 +121,12 @@ void Dialogaddpreorder::on_FindPorodutsInCombobox()
     {
         qDebug() << "ARG -----------------";
     }
+}
+
+
+
+void Dialogaddpreorder::on_checkBox_Calendar_toggled(bool checked)
+{
+    ui->dateEdit->setCalendarPopup(checked);
 }
 

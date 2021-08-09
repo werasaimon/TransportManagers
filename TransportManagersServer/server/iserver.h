@@ -1,19 +1,19 @@
-#ifndef MYSERVER_H
-#define MYSERVER_H
+#ifndef ISERVER_H
+#define ISERVER_H
 
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QAbstractSocket>
-#include "myclient.h"
+#include "iclient.h"
 
 #include <QPlainTextEdit>
 #include <QSqlQuery>
 
-class MyServer : public QTcpServer
+class IServer : public QTcpServer
 {
     Q_OBJECT
 public:
-    explicit MyServer(QObject *parent = 0);
+    explicit IServer(QObject *parent = 0);
     void StartServer(QHostAddress ip = QHostAddress::Any , quint16 port = 1234);
 
     QSqlQuery *m_Query;
@@ -27,4 +27,4 @@ public slots:
     
 };
 
-#endif // MYSERVER_H
+#endif // ISERVER_H

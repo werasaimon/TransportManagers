@@ -12,17 +12,17 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     this->setWindowTitle( "Meneger Server" );
-    db = QSqlDatabase::addDatabase("QMYSQL");
-    db.setHostName("127.0.0.1");
-    db.setDatabaseName("db_wera2");
-    db.setUserName("wera2");
-    db.setPassword("123");
+//    db = QSqlDatabase::addDatabase("QMYSQL");
+//    db.setHostName("127.0.0.1");
+//    db.setDatabaseName("db_wera2");
+//    db.setUserName("wera2");
+//    db.setPassword("123");
 
 
-//    db = QSqlDatabase::addDatabase("QSQLITE");
-//    db.setDatabaseName("./database.db");
-////    db.setUserName("werasaimon");
-////    db.setPassword("123qwe");
+    db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName("./database.db");
+//////    db.setUserName("werasaimon");
+//////    db.setPassword("123qwe");
 
     if(!db.open())
     {
@@ -30,57 +30,58 @@ MainWindow::MainWindow(QWidget *parent)
     }
     else
     {
-                //        qDebug() << "Succses!";
-                //        QString quary = "CREATE TABLE preorders ("
-                //                        "ID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,"
-                //                        "Text VARCHAR(255),"
-                //                        "Data DATATIME,"
-                //                        "Username VARCHAR(255),"
-                //                        "Weight  INTEGER,"
-                //                        "Address VARCHAR(255),"
-                //                        "Product VARCHAR(255),"
-                //                        "Status  VARCHAR(255));";
+        qDebug() << "Succses!";
+        QString quary = "CREATE TABLE preorders ("
+                                        "ID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,"
+                                        "Text VARCHAR(255),"
+                                        "Date DATATIME, "
+                                        "Username VARCHAR(255),"
+                                        "Weight INTEGER,"
+                                        "Address VARCHAR(255),"
+                                        "Product VARCHAR(255),"
+                                        "Status VARCHAR(255));";
 
-                //                        //"Status  ENUM ('Waiting', 'Executo', 'Final'));";
+        //"Status  ENUM ('Waiting', 'Executo', 'Final'));";
 
-                //        QString quary2 = "CREATE TABLE users ("
-                //                         "Username VARCHAR(255),"
-                //                         "Password VARCHAR(255),"
-                //                         "ID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE);";
+        QString quary2 = "CREATE TABLE users ("
+                                         "Username VARCHAR(255),"
+                                         "Password VARCHAR(255),"
+                                         "ID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE);";
 
 
-                //        QString quary3 = "CREATE TABLE fulfill ("
-                //                         //"ID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,"
-                //                         "ID_Oreder INTEGER NOT NULL PRIMARY KEY,"
-                //                         "Username VARCHAR(255) UNIQUE,"
-                //                         "Text VARCHAR(255),"
-                //                         "Data DATATIME);";
+        QString quary3 = "CREATE TABLE fulfill ("
+                                         //"ID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,"
+                                         "ID_Oreder INTEGER,"
+                                         "Username VARCHAR(25),"
+                                         "Text VARCHAR(255),"
+                                         "Data DATATIME,"
+                                         "PRIMARY KEY(ID_Oreder,Username));";
 
-                //        QString quary4 = "CREATE TABLE products ("
-                //                         "ID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,"
-                //                         "Name VARCHAR(255));";
+        QString quary4 = "CREATE TABLE products ("
+                                         "ID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,"
+                                         "Name VARCHAR(255));";
 
-                //        QSqlQuery qry(db);
+        QSqlQuery qry(db);
 
-                //        if(!qry.exec(quary))
-                //        {
-                //            qDebug() << "error creating table preorders";
-                //        }
+        if(!qry.exec(quary))
+        {
+            qDebug() << "error creating table preorders";
+        }
 
-                //        if(!qry.exec(quary2))
-                //        {
-                //            qDebug() << "error creating table users";
-                //        }
+        if(!qry.exec(quary2))
+        {
+            qDebug() << "error creating table users";
+        }
 
-                //        if(!qry.exec(quary3))
-                //        {
-                //            qDebug() << "error creating table fulfill";
-                //        }
+        if(!qry.exec(quary3))
+        {
+            qDebug() << "error creating table fulfill";
+        }
 
-                //        if(!qry.exec(quary4))
-                //        {
-                //            qDebug() << "error creating table products";
-                //        }
+        if(!qry.exec(quary4))
+        {
+            qDebug() << "error creating table products";
+        }
 
         //qDebug() << "yes create table";
     }
@@ -111,6 +112,10 @@ MainWindow::MainWindow(QWidget *parent)
     //----------------------------------------//
 
 
+    ui->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->tableView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customMenuRequested(QPoint)));
+
+
 }
 
 MainWindow::~MainWindow()
@@ -122,20 +127,20 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
-    if(!m_Query->exec(ui->plainTextEditScript->toPlainText().toStdString().c_str()))
-    {
-        qDebug() << m_Query->lastError().databaseText();
-        qDebug() << m_Query->lastError().driverText();
-        return;
-    }
-    else
-    {
-        qDebug() << "query.record()";
-        while (m_Query->next())
-        {
-            qDebug() << m_Query->record();
-        }
-    }
+//    if(!m_Query->exec(ui->plainTextEditScript->toPlainText().toStdString().c_str()))
+//    {
+//        qDebug() << m_Query->lastError().databaseText();
+//        qDebug() << m_Query->lastError().driverText();
+//        return;
+//    }
+//    else
+//    {
+//        qDebug() << "query.record()";
+//        while (m_Query->next())
+//        {
+//            qDebug() << m_Query->record();
+//        }
+//    }
 
 
 
@@ -163,8 +168,9 @@ void MainWindow::on_pushButton_clicked()
 
 
        // QSqlQueryModel *model = new QSqlQueryModel;
+
         t_model->setQuery(QSqlQuery(ui->plainTextEditScript->toPlainText().toStdString().c_str()));
-       // ui->tableView->setModel(model);
+        ui->tableView->setModel(t_model);
        // ui->tableView->setSortingEnabled(true);
 
 
@@ -180,18 +186,79 @@ void MainWindow::on_pushButton_clicked()
 }
 
 
-void MainWindow::on_pushButton_2_clicked()
+//void MainWindow::on_pushButton_3_clicked()
+//{
+//    int selectRow = ui->tableView->currentIndex().row();
+//    if( selectRow >= 0)
+//    {
+//        qDebug() << "Delete row " << t_model->removeRow(selectRow);
+//       //QDataWidgetMapper *mapper;
+//       //mapper->setModel(model);
+//        //mapper->addMapping(ui->lineEdit_ID,0);
+//    }
+//    else
+//    {
+//        qDebug() << "no row selected ";
+//    }
+
+//}
+
+
+
+
+
+
+QModelIndex index;
+void MainWindow::customMenuRequested(QPoint pos)
 {
-  qDebug() << " insert row " <<   t_model->insertRow(t_model->rowCount());
+    index=ui->tableView->indexAt(pos);
+
+    QMenu *menu=new QMenu(this);
+
+    QAction * editDevice = new QAction(trUtf8("Редактировать"), this);
+    QAction * deleteDevice = new QAction(trUtf8("Удалить"), this);
+
+    connect(editDevice, SIGNAL(triggered()), this, SLOT(slotEditRecord()));     // Call Handler dialog editing
+    connect(deleteDevice, SIGNAL(triggered()), this, SLOT(slotRemoveRecord())); // Handler delete records
+
+    menu->addAction(editDevice);
+    menu->addAction(deleteDevice);
+
+    menu->popup(ui->tableView->viewport()->mapToGlobal(pos));
 }
 
-
-void MainWindow::on_pushButton_3_clicked()
+void MainWindow::slotEditRecord()
 {
+    qDebug() << "Редактировать";
+
+    EditForm->mapper->setCurrentModelIndex(index);
+    EditForm->FindProducts();
+    EditForm->show();
+}
+
+void MainWindow::slotRemoveRecord()
+{
+    qDebug() << "Удалить";
     int selectRow = ui->tableView->currentIndex().row();
     if( selectRow >= 0)
     {
+        if(ui->comboBox_TABLE->currentText() == QString("preorders"))
+        {
+            auto index = ui->tableView->selectionModel()->currentIndex();
+            auto value = index.sibling(index.row(),0).data();
+            int ID = value.toInt();
+            m_Query->prepare("DELETE FROM fulfill WHERE ID_Oreder = :id");
+            m_Query->bindValue(":id", ID);
+            m_Query->exec();
+
+            qDebug() << "Print  : " << value.toInt() ;
+        }
+
         qDebug() << "Delete row " << t_model->removeRow(selectRow);
+       //QDataWidgetMapper *mapper;
+       //mapper->setModel(model);
+        //mapper->addMapping(ui->lineEdit_ID,0);
+        //t_model->submitAll();
     }
     else
     {
@@ -200,44 +267,49 @@ void MainWindow::on_pushButton_3_clicked()
 }
 
 
-void MainWindow::on_pushButton_4_clicked()
+void MainWindow::on_actionAdd_Orders_triggered()
+{
+    m_AddPreorderWidget->setQuery(m_Query);
+    m_AddPreorderWidget->FindProducts();
+    m_AddPreorderWidget->show();
+    //t_model->select();
+    //t_model->submitAll();
+}
+
+
+void MainWindow::on_actionAdd_Product_triggered()
+{
+    m_AddProductWidget->setQuery(m_Query);
+    m_AddProductWidget->show();
+    //t_model->submit();
+}
+
+
+void MainWindow::on_actionAdd_User_triggered()
+{
+    m_AddClientWidget->setQuery(m_Query);
+    m_AddClientWidget->show();
+}
+
+
+
+void MainWindow::on_pushButton_Submit_clicked()
 {
     t_model->submitAll();
 }
 
 
-void MainWindow::on_pushButton_5_clicked()
+void MainWindow::on_pushButton_StartServer_clicked()
 {
-    t_model->revertAll();
-}
-
-
-void MainWindow::on_pushButton_6_clicked()
-{
-    t_model->select();
-}
-
-
-void MainWindow::on_tableView_doubleClicked(const QModelIndex &index)
-{
-    EditForm->mapper->setCurrentModelIndex(index);
-    EditForm->FindProducts();
-    EditForm->show();
-}
-
-
-void MainWindow::on_pushButton_7_clicked()
-{
-
     if(!m_Server)
     {
         QHostAddress IP = QHostAddress(ui->lineEdit_IP->text());
         quint16 PORT = 1234;
 
-        m_Server = new MyServer();
+        m_Server = new IServer();
         m_Server->StartServer(IP,PORT);
         m_Server->m_Query = m_Query;
-        ui->pushButton_7->setText("Stop Server");
+        ui->pushButton_StartServer->setText("Stop Server");
     }
     else
     {
@@ -245,79 +317,19 @@ void MainWindow::on_pushButton_7_clicked()
         m_Server->close();
         delete  m_Server;
         m_Server = nullptr;
-        ui->pushButton_7->setText("Start Server");
-    }
-
-
-}
-
-
-
-void MainWindow::on_pushButton_8_clicked()
-{
-    m_Query->prepare("SELECT * FROM fulfill WHERE ID_Oreder = :id ");
-    m_Query->bindValue(":id", 4);
-    m_Query->exec();
-
-    while(m_Query->next())
-    {
-        qDebug() << m_Query->value(1).toString();
+         qDebug() << "Server: stop";
+        ui->pushButton_StartServer->setText("Start Server");
     }
 }
 
 
-void MainWindow::on_pushButton_AddUser_clicked()
+void MainWindow::on_comboBox_TABLE_currentTextChanged(const QString &arg1)
 {
-    //     QSqlQuery query;
-    //     query.prepare("INSERT INTO users (Username, Password, ID) "
-    //                   "VALUES (:Username, :Password, :ID)");
+    qDebug() << arg1;
 
-    //     query.bindValue(":Username", "wera");
-    //     query.bindValue(":Password", "123");
-    //     query.bindValue(":ID", 1001);
-
-    //     query.exec();
-
-         m_AddClientWidget->setQuery(m_Query);
-         m_AddClientWidget->show();
-}
-
-
-void MainWindow::on_pushButton_Preorder_clicked()
-{
-
-        //      m_Query->prepare("INSERT INTO tab (ID, Text, Date) "
-        //                    "VALUES (:ID, :Text, :Date)");
-        //      m_Query->bindValue(":ID", 1001);
-        //      m_Query->bindValue(":Text", "Bart");
-        //      m_Query->bindValue(":Date", QString("2000-01-01"));
-        //     /// query.exec();
-
-//    m_Query->prepare("INSERT INTO tab ( Data ) "
-//                     "VALUES ( :Data )");
-
-    //m_Query->bindValue(":ID_Oreder", _order.ID);
-    //m_Query->bindValue(":Text", "_order.Text");
-   // m_Query->bindValue(":Data", "01.01.2000");
-
-//    m_Query->prepare("INSERT preorders (ID, Text, Data) "
-//                       "VALUES (:ID , :Text, :Data)");
-//    m_Query->bindValue(":Text", "wkkkxxxxxxxxx");
-   // m_Query->bindValue(":ID" ,20);
-   // m_Query->bindValue(":Data" ,QString("01.01.2020"));
-   // m_Query->exec();
-
-    m_AddPreorderWidget->setQuery(m_Query);
-    m_AddPreorderWidget->FindProducts();
-    m_AddPreorderWidget->show();
-    t_model->submit();
-}
-
-
-void MainWindow::on_pushButton_AddProduct_clicked()
-{
-    m_AddProductWidget->setQuery(m_Query);
-    m_AddProductWidget->show();
-    t_model->submit();
+    QString table_name = arg1;
+    t_model->setQuery(QSqlQuery(QString("SELECT * FROM") + QString(table_name)));
+    t_model->setTable(table_name);
+    t_model->select();
 }
 

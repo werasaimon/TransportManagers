@@ -1,5 +1,5 @@
 
-#include "mytask.h"
+#include "itask.h"
 #include <QDebug>
 
 

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>661</width>
-    <height>497</height>
+    <width>701</width>
+    <height>554</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,7 +16,39 @@
   <layout class="QGridLayout" name="gridLayout_5">
    <item row="0" column="0">
     <layout class="QGridLayout" name="gridLayout_4">
-     <item row="5" column="0">
+     <item row="12" column="0">
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="1">
+        <widget class="QPushButton" name="pushButton_2">
+         <property name="text">
+          <string>Clients</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QPushButton" name="pushButton">
+         <property name="text">
+          <string>Upload</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QPushButton" name="pushButton_Delete">
+         <property name="text">
+          <string>Delete</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="9" column="0">
+      <widget class="QLineEdit" name="lineEdit_Address">
+       <property name="placeholderText">
+        <string>Address</string>
+       </property>
+      </widget>
+     </item>
+     <item row="11" column="0">
       <widget class="QComboBox" name="comboBox_Clients">
        <property name="font">
         <font>
@@ -31,48 +63,49 @@
        </property>
       </widget>
      </item>
-     <item row="6" column="0">
-      <layout class="QGridLayout" name="gridLayout_3">
-       <item row="0" column="0">
-        <widget class="QPushButton" name="pushButton">
-         <property name="text">
-          <string>Upload</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QPushButton" name="pushButton_2">
-         <property name="text">
-          <string>Clients</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
      <item row="0" column="0">
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="0" column="2" alignment="Qt::AlignRight">
-        <widget class="QLineEdit" name="lineEdit_ID">
-         <property name="enabled">
-          <bool>false</bool>
+       <item row="0" column="6">
+        <widget class="QDateEdit" name="dateEdit">
+         <property name="minimumSize">
+          <size>
+           <width>147</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>147</width>
+           <height>22</height>
+          </size>
          </property>
         </widget>
        </item>
-       <item row="0" column="1" alignment="Qt::AlignRight">
+       <item row="0" column="7">
+        <widget class="QCheckBox" name="checkBox_Calendar">
+         <property name="text">
+          <string>Calendar</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2" alignment="Qt::AlignRight">
         <widget class="QLabel" name="label_2">
          <property name="text">
           <string>ID</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="4" alignment="Qt::AlignRight">
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>DATE</string>
+       <item row="0" column="3" alignment="Qt::AlignRight">
+        <widget class="QLineEdit" name="lineEdit_ID">
+         <property name="enabled">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
-       <item row="0" column="6">
+       <item row="0" column="9">
         <layout class="QFormLayout" name="formLayout">
          <item row="0" column="0">
           <widget class="QLabel" name="label_3">
@@ -90,23 +123,21 @@
          </item>
         </layout>
        </item>
-       <item row="0" column="5">
-        <widget class="QDateEdit" name="dateEdit">
-         <property name="minimumSize">
-          <size>
-           <width>147</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>147</width>
-           <height>22</height>
-          </size>
+       <item row="0" column="5" alignment="Qt::AlignRight">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>DATE</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="0" alignment="Qt::AlignRight">
+       <item row="0" column="4">
+        <widget class="Line" name="line_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" alignment="Qt::AlignLeft">
         <widget class="QComboBox" name="comboBox_Status">
          <property name="maximumSize">
           <size>
@@ -131,39 +162,64 @@
          </item>
         </widget>
        </item>
+       <item row="0" column="8">
+        <widget class="Line" name="line">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="Line" name="line_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
-     <item row="4" column="0">
-      <widget class="QPlainTextEdit" name="plainTextEdit"/>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLineEdit" name="lineEdit_Address">
-       <property name="placeholderText">
-        <string>Address</string>
+     <item row="3" column="0" alignment="Qt::AlignHCenter">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Product Name</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
-      <layout class="QGridLayout" name="gridLayout"/>
+     <item row="10" column="0">
+      <widget class="QPlainTextEdit" name="plainTextEdit">
+       <property name="documentTitle">
+        <string>Message</string>
+       </property>
+       <property name="placeholderText">
+        <string>Message</string>
+       </property>
+      </widget>
      </item>
-     <item row="2" column="0">
+     <item row="6" column="0">
       <widget class="QSplitter" name="splitter">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
-       <widget class="QComboBox" name="comboBox_NameProducts">
-        <property name="minimumSize">
-         <size>
-          <width>73</width>
-          <height>22</height>
-         </size>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="lineEdit_CurrentProduct">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-       </widget>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="Line" name="line_4">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QComboBox" name="comboBox_NameProducts"/>
+     </item>
+     <item row="1" column="0">
+      <layout class="QGridLayout" name="gridLayout"/>
+     </item>
+     <item row="5" column="0">
+      <widget class="Line" name="line_5">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
       </widget>
      </item>
     </layout>

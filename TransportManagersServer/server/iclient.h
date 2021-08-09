@@ -1,5 +1,5 @@
-#ifndef MYCLIENT_H
-#define MYCLIENT_H
+#ifndef ICLIENT_H
+#define ICLIENT_H
 
 #include <QObject>
 #include <QTcpSocket>
@@ -10,16 +10,16 @@
 #include <QPlainTextEdit>
 #include <QSqlQuery>
 
-#include "mytask.h"
+#include "itask.h"
 
 
 
 
-class MyClient : public QObject
+class IClient : public QObject
 {
     Q_OBJECT
 public:
-    explicit MyClient(QObject *parent = 0);
+    explicit IClient(QObject *parent = 0);
     void SetSocket(int Descriptor);
 
     QSqlQuery *m_Query;
@@ -52,4 +52,4 @@ private:
     
 };
 
-#endif // MYCLIENT_H
+#endif // ICLIENT_H

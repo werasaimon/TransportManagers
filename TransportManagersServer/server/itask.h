@@ -1,5 +1,5 @@
-#ifndef MYTASK_H
-#define MYTASK_H
+#ifndef ITASK_H
+#define ITASK_H
 
 #include <QRunnable>
 #include <QObject>
@@ -33,4 +33,4 @@ private:
     QTcpSocket * m_TCPSocket;
 };
 
-#endif // MYTASK_H
+#endif // ITASK_H

@@ -4,12 +4,15 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QSqlRecord>
+#include <QCalendarWidget>
 
 DialogRecortEditForm::DialogRecortEditForm(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DialogRecortEditForm)
 {
     ui->setupUi(this);
+
+    ui->dateEdit->setCalendarPopup(true);
 
     //----------------------------------------------------//
 
@@ -18,7 +21,8 @@ DialogRecortEditForm::DialogRecortEditForm(QWidget *parent) :
 
     //----------------------------------------------------//
 
-    QObject::connect(ui->comboBox_NameProducts, SIGNAL(activated(QString)), this, SLOT(on_InsertProduct(QString)));
+    QObject::connect(ui->comboBox_NameProducts, SIGNAL(activated(QString)), this, SLOT(on_SelectedProduct(QString)));
+    QObject::connect(ui->comboBox_Clients, SIGNAL(activated(QString)), this, SLOT(on_SelectedClient(QString)));
 
 }
 
@@ -62,8 +66,8 @@ void DialogRecortEditForm::FindProducts()
 
 void DialogRecortEditForm::on_pushButton_clicked()
 {
-   mapper->submit();
-   close();
+    mapper->submit();
+    close();
 }
 
 
@@ -83,9 +87,10 @@ void DialogRecortEditForm::on_pushButton_2_clicked()
     {
         QString item = m_Query->value(name).toString();
         ui->comboBox_Clients->insertItem(0,item);
-        //ui->comboBox_Clients->setCurrentText(item);
+        ui->comboBox_Clients->setCurrentText(item);
     }
-     ui->comboBox_Clients->insertItem(0,"");
+
+    ui->comboBox_Clients->insertItem(0,"");
 
 
 //    while (query.next()) {
@@ -94,10 +99,37 @@ void DialogRecortEditForm::on_pushButton_2_clicked()
      //        }
 }
 
-void DialogRecortEditForm::on_InsertProduct(QString _current)
+void DialogRecortEditForm::on_SelectedProduct(QString _current)
 {
-   ui->lineEdit_CurrentProduct->setText(_current);
-   //ui->comboBox_Status->setCurrentText("Executor");
+   //ui->lineEdit_CurrentProduct->setText(_current);
 }
 
+void DialogRecortEditForm::on_SelectedClient(QString _current)
+{
+    if(_current != "")
+    {
+       ui->comboBox_Status->setCurrentText("Executor");
+    }
+}
+
+
+void DialogRecortEditForm::on_checkBox_Calendar_toggled(bool checked)
+{
+    ui->dateEdit->setCalendarPopup(checked);
+}
+
+
+void DialogRecortEditForm::on_pushButton_Delete_clicked()
+{
+    qDebug() << "Delete ID: " << ui->lineEdit_ID->text().toInt();
+    int ID = ui->lineEdit_ID->text().toInt();
+    m_Query->prepare("DELETE FROM fulfill WHERE ID_Oreder = :id");
+    m_Query->bindValue(":id", ID);
+    m_Query->exec();
+    m_Query->prepare("DELETE FROM preorders WHERE ID = :id");
+    m_Query->bindValue(":id", ID);
+    m_Query->exec();
+    mapper->submit();
+    close();
+}
 

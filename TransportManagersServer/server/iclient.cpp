@@ -1,4 +1,4 @@
-#include "myclient.h"
+#include "iclient.h"
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QSqlRecord>
@@ -16,13 +16,13 @@
 
 
 
-MyClient::MyClient(QObject *parent) :
+IClient::IClient(QObject *parent) :
     QObject(parent)
 {
     QThreadPool::globalInstance()->setMaxThreadCount(4);
 }
 
-void MyClient::SetSocket(int Descriptor)
+void IClient::SetSocket(int Descriptor)
 {
     // make a new socket
     socket = new QTcpSocket(this);
@@ -40,13 +40,13 @@ void MyClient::SetSocket(int Descriptor)
 
 
 // asynchronous - runs separately from the thread we created
-void MyClient::connected()
+void IClient::connected()
 {
     qDebug() << "Client connected event";
 }
 
 // asynchronous
-void MyClient::disconnected()
+void IClient::disconnected()
 {
     qDebug() << "Client disconnected";
 }
@@ -55,9 +55,9 @@ void MyClient::disconnected()
 // This happening via main thread
 // Our code running in our thread not in Qthread
 // That's why we're getting the thread from the pool
-void MyClient::readyRead()
+void IClient::readyRead()
 {
-    qDebug() << "MyClient::readyRead()";
+    qDebug() << "IClient::readyRead()";
     //qDebug() << socket->readAll();
     //_str = socket->readAll();
    // socket->write(socket->readAll());
@@ -80,7 +80,7 @@ void MyClient::readyRead()
 
 // After a task performed a time consuming task.
 // We grab the result here, and send it to client
-void MyClient::TaskResult(QTcpSocket* socket)
+void IClient::TaskResult(QTcpSocket* socket)
 {
    // QByteArray Buffer;
    // Buffer.append("\r\nTask result = ");
@@ -106,7 +106,7 @@ void MyClient::TaskResult(QTcpSocket* socket)
     }
 }
 
-QString MyClient::SQLQuery(const QString &sqlquery , QSqlQuery query)
+QString IClient::SQLQuery(const QString &sqlquery , QSqlQuery query)
 {
     QJsonDocument  json;
     QJsonArray     recordsArray;
@@ -125,7 +125,7 @@ QString MyClient::SQLQuery(const QString &sqlquery , QSqlQuery query)
     return json.toJson();
 }
 
-void MyClient::AnswerToKey_SQL(QDataStream &_stream_tcp_ip)
+void IClient::AnswerToKey_SQL(QDataStream &_stream_tcp_ip)
 {
       QByteArray SQL_Edit;
      _stream_tcp_ip >> SQL_Edit;
@@ -155,7 +155,7 @@ void MyClient::AnswerToKey_SQL(QDataStream &_stream_tcp_ip)
      }
 }
 
-void MyClient::AnswerToKey_User(QDataStream &_stream_tcp_ip)
+void IClient::AnswerToKey_User(QDataStream &_stream_tcp_ip)
 {
 
     QString username;
@@ -207,7 +207,7 @@ void MyClient::AnswerToKey_User(QDataStream &_stream_tcp_ip)
     delete bw;
 }
 
-void MyClient::AnswerToKey_Order(QDataStream &_stream_tcp_ip)
+void IClient::AnswerToKey_Order(QDataStream &_stream_tcp_ip)
 {
     Order _order;
     _stream_tcp_ip >> _order.ID;
@@ -217,23 +217,28 @@ void MyClient::AnswerToKey_Order(QDataStream &_stream_tcp_ip)
 
 
 
+//    //--------------------------------- SQLite ------------------------------//
+
 //    m_Query->prepare("SELECT ID_Oreder FROM fulfill WHERE Username = :username AND ID_Oreder = :id AND Data = :data");
 //    m_Query->bindValue(":id", _order.ID);
 //    m_Query->bindValue(":username", _order.Username);
 //    m_Query->bindValue(":data", _order.Data);
 //    m_Query->exec();
 
-////    if(!m_Query->isActive())
-////    {
-////        qDebug() << ("SQL Statement execution failed");
-////        return;
-////    }
+//////    if(!m_Query->isActive())
+//////    {
+//////        qDebug() << ("SQL Statement execution failed");
+//////        return;
+//////    }
 
 //    while (m_Query->next())
 //    {
 //        qDebug() << ("SQL While");
 //        return;
 //    }
+
+//    //-----------------------------------------------------------------------//
+
 
 
     qDebug() << "ID: " << _order.ID;
@@ -279,7 +284,7 @@ void MyClient::AnswerToKey_Order(QDataStream &_stream_tcp_ip)
     m_Query->exec();
 }
 
-void MyClient::AnswerToKey_List(QDataStream &_stream_tcp_ip)
+void IClient::AnswerToKey_List(QDataStream &_stream_tcp_ip)
 {
      QString sql;
     _stream_tcp_ip >> sql;
@@ -371,22 +376,18 @@ void MyClient::AnswerToKey_List(QDataStream &_stream_tcp_ip)
          }
 
          delete bw;
-
-
-
     }
-
-
 }
 
-void MyClient::AnswerToKey_fulfillment(QDataStream &_stream_tcp_ip)
+
+void IClient::AnswerToKey_fulfillment(QDataStream &_stream_tcp_ip)
 {
     QString username;
     _stream_tcp_ip >> username;
 
     qDebug() << username;
 
-    m_Query->prepare("SELECT * FROM preorders WHERE Username = :username ");
+    m_Query->prepare("SELECT * FROM preorders WHERE Username = :username");
     m_Query->bindValue(":username", username);
 
     if(!m_Query->exec())

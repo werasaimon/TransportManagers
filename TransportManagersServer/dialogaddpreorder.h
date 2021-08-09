@@ -31,6 +31,9 @@ private slots:
     void on_pushButton_Add_clicked();
     void on_FindPorodutsInCombobox();
 
+
+    void on_checkBox_Calendar_toggled(bool checked);
+
 private:
     Ui::Dialogaddpreorder *ui;
     QSqlQuery *m_Query;

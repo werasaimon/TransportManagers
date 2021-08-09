@@ -26,7 +26,13 @@ private slots:
 
     void on_pushButton_clicked();
     void on_pushButton_2_clicked();
-    void on_InsertProduct(QString _current);
+    void on_SelectedProduct(QString _current);
+    void on_SelectedClient(QString _current);
+
+    void on_checkBox_Calendar_toggled(bool checked);
+
+    void on_pushButton_Delete_clicked();
+
 private:
     Ui::DialogRecortEditForm *ui;
 

@@ -1,11 +1,11 @@
-#include "myserver.h"
+#include "iserver.h"
 
-MyServer::MyServer(QObject *parent) :
+IServer::IServer(QObject *parent) :
     QTcpServer(parent)
 {
 }
 
-void MyServer::StartServer(QHostAddress ip, quint16 port)
+void IServer::StartServer(QHostAddress ip, quint16 port)
 {
     if(listen(ip, port))
     {
@@ -17,10 +17,10 @@ void MyServer::StartServer(QHostAddress ip, quint16 port)
     }
 }
 
-void MyServer::incomingConnection(int handle)
+void IServer::incomingConnection(int handle)
 {
     // at the incoming connection, make a client
-    MyClient *client = new MyClient(this);
+    IClient *client = new IClient(this);
     client->m_Query = m_Query;
     client->SetSocket(handle);
 }

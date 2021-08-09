@@ -20,9 +20,9 @@ SOURCES += \
     dialogrecorteditform.cpp \
     main.cpp \
     mainwindow.cpp \
-    server/myclient.cpp \
-    server/myserver.cpp \
-    server/mytask.cpp
+    server/iclient.cpp \
+    server/iserver.cpp \
+    server/itask.cpp
 
 
 HEADERS += \
@@ -37,9 +37,9 @@ HEADERS += \
     dialogaddproduct.h \
     dialogrecorteditform.h \
     mainwindow.h \
-    server/myclient.h \
-    server/myserver.h \
-    server/mytask.h
+    server/iclient.h \
+    server/iserver.h \
+    server/itask.h
 
 
 FORMS += \

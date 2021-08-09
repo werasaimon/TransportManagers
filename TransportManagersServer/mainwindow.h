@@ -10,7 +10,7 @@
 #include "dialogaddpreorder.h"
 #include "dialogaddproduct.h"
 
-#include "server/myserver.h"
+#include "server/iserver.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -47,21 +47,22 @@ public:
 private slots:
 
     void on_pushButton_clicked();
-    void on_pushButton_2_clicked();
-    void on_pushButton_3_clicked();
-    void on_pushButton_4_clicked();
-    void on_pushButton_5_clicked();
-    void on_pushButton_6_clicked();
+    void on_pushButton_Submit_clicked();
+    void on_pushButton_StartServer_clicked();
 
-    void on_tableView_doubleClicked(const QModelIndex &index);
+    void customMenuRequested(QPoint pos);
+    void slotEditRecord();
+    void slotRemoveRecord();
 
-    void on_pushButton_7_clicked();
-    void on_pushButton_8_clicked();
+    // QMenu--QToolBar
+    void on_actionAdd_Orders_triggered();
+    void on_actionAdd_Product_triggered();
+    void on_actionAdd_User_triggered();
 
-    void on_pushButton_AddUser_clicked();
-    void on_pushButton_Preorder_clicked();
 
-    void on_pushButton_AddProduct_clicked();
+
+
+    void on_comboBox_TABLE_currentTextChanged(const QString &arg1);
 
 private:
 
@@ -79,7 +80,7 @@ private:
     QSqlTableModel2 *t_model;
 
     // Create an instance of a server.
-    MyServer *m_Server = nullptr;
+    IServer *m_Server = nullptr;
     QSqlQuery *m_Query;
 };
 #endif // MAINWINDOW_H
