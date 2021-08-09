@@ -450,7 +450,7 @@ void MainWindow::AnswerToKey_List(QDataStream &_stream_tcp_ip)
         ui->listWidget_A->setItemWidget(itemN, widget);
          //-------------------------------------//
 
-        mMapOrders[itemN] = _Order;
+        mMapOrders.insert(itemN,_Order);
 
 //        mMapOrders[itemN].ID = _Order.ID;
 //        mMapOrders[itemN].Text = _Order.Text;
@@ -531,7 +531,7 @@ void MainWindow::AnswerToKey_fulfillment(QDataStream &_stream_tcp_ip)
         ui->listWidget_A->setItemWidget(itemN, widget);
          //-------------------------------------//
 
-        mMapOrders[itemN] = _Order;
+        mMapOrders.insert(itemN,_Order);
 
 //        mMapOrders[itemN].ID = _Order.ID;
 //        mMapOrders[itemN].Text = _Order.Text;
