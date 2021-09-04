@@ -16,6 +16,7 @@ Order::Order(const Order &_order)
     this->Address = _order.Address;
     this->Product = _order.Product;
     this->Status = _order.Status;
+    this->Manager = _order.Manager;
 
 }
 
@@ -29,6 +30,7 @@ Order &Order::operator=(const Order &_order)
     this->Address = _order.Address;
     this->Product = _order.Product;
     this->Status = _order.Status;
+    this->Manager = _order.Manager;
 }
 
 

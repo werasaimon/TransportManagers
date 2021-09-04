@@ -18,6 +18,7 @@ QDataStream &operator<<( QDataStream &lhs, const Order &rhs)
     lhs << rhs.Address;
     lhs << rhs.Product;
     lhs << rhs.Status;
+    lhs << rhs.Manager;
     return lhs;
 }
 
@@ -31,6 +32,7 @@ QDataStream &operator>>(QDataStream &lhs, Order &rhs)
     lhs >> rhs.Address;
     lhs >> rhs.Product;
     lhs >> rhs.Status;
+    lhs >> rhs.Manager;
     return lhs;
 }
 

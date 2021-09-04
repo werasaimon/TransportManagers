@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>99</height>
+    <height>105</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,7 +24,7 @@
         </font>
        </property>
        <property name="placeholderText">
-        <string>Name Product</string>
+        <string>Имя продукта</string>
        </property>
       </widget>
      </item>

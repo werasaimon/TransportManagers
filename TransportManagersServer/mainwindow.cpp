@@ -11,7 +11,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    this->setWindowTitle( "Meneger Server" );
+    this->setWindowTitle( "Менеджер + Сервер" );
 //    db = QSqlDatabase::addDatabase("QMYSQL");
 //    db.setHostName("127.0.0.1");
 //    db.setDatabaseName("db_wera2");
@@ -39,7 +39,8 @@ MainWindow::MainWindow(QWidget *parent)
                                         "Weight INTEGER,"
                                         "Address VARCHAR(255),"
                                         "Product VARCHAR(255),"
-                                        "Status VARCHAR(255));";
+                                        "Status VARCHAR(255),"
+                                        "Manager VARCHAR(255));";
 
         //"Status  ENUM ('Waiting', 'Executo', 'Final'));";
 

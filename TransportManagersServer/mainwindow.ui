@@ -52,7 +52,7 @@
         <item>
          <widget class="QPushButton" name="pushButton">
           <property name="text">
-           <string>sql run</string>
+           <string>выполнить SQL-запрос!</string>
           </property>
          </widget>
         </item>
@@ -67,7 +67,7 @@
         <item>
          <widget class="QPushButton" name="pushButton_Submit">
           <property name="text">
-           <string>sumbit</string>
+           <string>Обновить</string>
           </property>
          </widget>
         </item>
@@ -91,7 +91,7 @@
         <item row="0" column="0">
          <widget class="QLabel" name="label">
           <property name="text">
-           <string>TABLE</string>
+           <string>ТАБЛИЦЫ</string>
           </property>
          </widget>
         </item>
@@ -137,7 +137,10 @@
       <item alignment="Qt::AlignRight">
        <widget class="QLineEdit" name="lineEdit_IP">
         <property name="text">
-         <string>127.0.0.1</string>
+         <string/>
+        </property>
+        <property name="placeholderText">
+         <string>ip-адрес</string>
         </property>
        </widget>
       </item>
@@ -182,17 +185,17 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionAdd_Orders">
    <property name="text">
-    <string>Add Orders</string>
+    <string>Добавит Заказ</string>
    </property>
   </action>
   <action name="actionAdd_Product">
    <property name="text">
-    <string>Add Product</string>
+    <string>Добавить Продукт</string>
    </property>
   </action>
   <action name="actionAdd_User">
    <property name="text">
-    <string>Add User</string>
+    <string>Добавить Клиента Водитиля</string>
    </property>
   </action>
  </widget>

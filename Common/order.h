@@ -33,6 +33,7 @@ public:
      QString Address;
      QString Product;
      QString Status;
+     QString Manager;
 
 };
 

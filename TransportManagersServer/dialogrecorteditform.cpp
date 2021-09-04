@@ -11,7 +11,7 @@ DialogRecortEditForm::DialogRecortEditForm(QWidget *parent) :
     ui(new Ui::DialogRecortEditForm)
 {
     ui->setupUi(this);
-
+    this->setWindowTitle( "Редактор заказа!" );
     ui->dateEdit->setCalendarPopup(true);
 
     //----------------------------------------------------//

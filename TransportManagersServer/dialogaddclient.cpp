@@ -6,6 +6,7 @@ DialogAddClient::DialogAddClient(QWidget *parent) :
     ui(new Ui::DialogAddClient)
 {
     ui->setupUi(this);
+    this->setWindowTitle( "Добавить Клиента!" );
 }
 
 DialogAddClient::~DialogAddClient()

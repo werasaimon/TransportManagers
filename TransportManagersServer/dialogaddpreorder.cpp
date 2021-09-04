@@ -11,7 +11,7 @@ Dialogaddpreorder::Dialogaddpreorder(QWidget *parent) :
     ui(new Ui::Dialogaddpreorder)
 {
     ui->setupUi(this);
-
+    this->setWindowTitle( "Добавить заказ" );
     ui->dateEdit->setCalendarPopup(true);
 
 //   QObject::connect(ui->comboBox_NameProducts, SIGNAL(activated(QString)), this, SLOT(on_FindPorodutsInCombobox()));

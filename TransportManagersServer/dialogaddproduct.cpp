@@ -6,6 +6,7 @@ Dialogaddproduct::Dialogaddproduct(QWidget *parent) :
     ui(new Ui::Dialogaddproduct)
 {
     ui->setupUi(this);
+    this->setWindowTitle( "Добавить Продукт" );
 }
 
 Dialogaddproduct::~Dialogaddproduct()

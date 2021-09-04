@@ -7,7 +7,9 @@
 #include <QListWidgetItem>
 #include "../Common/qjsontablemodel.h"
 #include "../Common/order.h"
+#include "../Common/blockreader.h"
 
+#include "dialogaddpreorder.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -44,13 +46,17 @@ private slots:
     void SendItem();
 
     void on_pushButton_fulfillment_clicked();
+    void on_pushButton_AddPreorder_clicked();
+
 
 private:
     Ui::MainWindow *ui;
     QTcpSocket  *m_TCPSocket = nullptr;
     //--------------------------------------//
-
     QJsonTableModel* episodes;
+
+    //--------------------------------------//
+    Dialogaddpreorder *m_AddPreorderWidget;
 
     //--------------------------------------//
     QMap<QListWidgetItem*, Order> mMapOrders;

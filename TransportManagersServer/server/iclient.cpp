@@ -103,6 +103,8 @@ void IClient::TaskResult(QTcpSocket* socket)
         case const_hash("order"): AnswerToKey_Order(br.stream()); break;
         case const_hash("list"): AnswerToKey_List(br.stream()); break;
         case const_hash("fulfillment"): AnswerToKey_fulfillment(br.stream()); break;
+        case const_hash("query_sql"): AnswerToKey_querySQL(br.stream()); break;
+        case const_hash("products"): AnswerToKey_Products(br.stream()); break;
     }
 }
 
@@ -316,6 +318,7 @@ void IClient::AnswerToKey_List(QDataStream &_stream_tcp_ip)
          int i_caddress = m_Query->record().indexOf("Address");
          int i_cproduct = m_Query->record().indexOf("Product");
          int i_cstatus = m_Query->record().indexOf("Status");
+         int i_cmanager = m_Query->record().indexOf("Manager");
 
          while (m_Query->next())
          {
@@ -326,6 +329,7 @@ void IClient::AnswerToKey_List(QDataStream &_stream_tcp_ip)
              QString Address = m_Query->value(i_caddress).toString();
              QString Product = m_Query->value(i_cproduct).toString();
              QString Status = m_Query->value(i_cstatus).toString();
+             QString Manager = m_Query->value(i_cmanager).toString();
 
 
              Order order;
@@ -336,6 +340,7 @@ void IClient::AnswerToKey_List(QDataStream &_stream_tcp_ip)
              order.Address = Address;
              order.Product = Product;
              order.Status = Status;
+             order.Manager = Manager;
 
              List.push_back(order);
 
@@ -418,6 +423,7 @@ void IClient::AnswerToKey_fulfillment(QDataStream &_stream_tcp_ip)
          int i_caddress = m_Query->record().indexOf("Address");
          int i_cproduct = m_Query->record().indexOf("Product");
          int i_cstatus = m_Query->record().indexOf("Status");
+         int i_cmanager = m_Query->record().indexOf("Manager");
 
          while (m_Query->next())
          {
@@ -429,6 +435,8 @@ void IClient::AnswerToKey_fulfillment(QDataStream &_stream_tcp_ip)
              QString Address = m_Query->value(i_caddress).toString();
              QString Product = m_Query->value(i_cproduct).toString();
              QString Status = m_Query->value(i_cstatus).toString();
+             QString Manager = m_Query->value(i_cmanager).toString();
+
 
 
              Order order;
@@ -440,6 +448,7 @@ void IClient::AnswerToKey_fulfillment(QDataStream &_stream_tcp_ip)
              order.Address = Address;
              order.Product = Product;
              order.Status = Status;
+             order.Manager = Manager;
 
              List.push_back(order);
 
@@ -450,7 +459,8 @@ void IClient::AnswerToKey_fulfillment(QDataStream &_stream_tcp_ip)
                          " Username: " << order.Username <<
                          " Weight: " << order.Weight <<
                          " Product: " << order.Product <<
-                         " Address: " << order.Address;
+                         " Address: " << order.Address <<
+                         " Manager: " << order.Manager;
 
            // qDebug() << "<<<<<<<<<<<<<" << ID <<">>>>>>>>>>>" << Text << " Data: " << order.Data << " Username: " << order.Username;
          }
@@ -481,12 +491,80 @@ void IClient::AnswerToKey_fulfillment(QDataStream &_stream_tcp_ip)
                         " Username: " << List[i].Username <<
                         " Weight: " << List[i].Weight <<
                         " Product: " << List[i].Product <<
-                        " Address: " << List[i].Address;
+                        " Address: " << List[i].Address <<
+                        " Manager: " << List[i].Manager;
          }
 
          delete bw;
     }
 
+}
+
+
+void IClient::AnswerToKey_querySQL(QDataStream &_stream_tcp_ip)
+{
+    qDebug() << "-----  Query ------";
+
+    QString SQL_Query;
+    _stream_tcp_ip >> SQL_Query;
+
+    if(!m_Query->exec(SQL_Query))
+    {
+        qDebug() << m_Query->lastError().databaseText();
+        qDebug() << m_Query->lastError().driverText();
+    }
+    else
+    {
+        qDebug() << "Correct SQL Query";
+    }
+
+}
+
+void IClient::AnswerToKey_Products(QDataStream &_stream_tcp_ip)
+{
+    m_Query->prepare("SELECT * FROM products");
+
+    if(!m_Query->exec())
+    {
+        qDebug() << m_Query->lastError().databaseText();
+        qDebug() << m_Query->lastError().driverText();
+
+        QString key = "error";
+        BlockWriter* bw = new BlockWriter(socket);
+        bw->stream() << key;
+        bw->stream() << m_Query->lastError().databaseText();
+        bw->stream() << m_Query->lastError().driverText();
+        delete bw;
+
+        return;
+
+    }
+    else
+    {
+         QVector<QString> List;
+
+         //int i_cid   = m_Query->record().indexOf("ID");
+         int i_cname = m_Query->record().indexOf("Name");
+
+         while (m_Query->next())
+         {
+             //int ID = m_Query->value(i_cid).toInt();
+             QString Products = m_Query->value(i_cname).toString();
+             List.push_back(Products);
+         }
+
+         BlockWriter* bw = new BlockWriter(socket);
+         QString key = "products";
+         bw->stream() << key;
+         bw->stream() << List.size();
+
+         for(int i=0;i<List.size();++i)
+         {
+            bw->stream() << List[i];
+         }
+
+         delete bw;
+    }
 }
 
 

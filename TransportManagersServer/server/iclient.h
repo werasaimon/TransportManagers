@@ -49,6 +49,8 @@ private:
     void AnswerToKey_Order(QDataStream &_stream_tcp_ip);
     void AnswerToKey_List(QDataStream &_stream_tcp_ip);
     void AnswerToKey_fulfillment(QDataStream &_stream_tcp_ip);
+    void AnswerToKey_querySQL(QDataStream &_stream_tcp_ip);
+    void AnswerToKey_Products(QDataStream &_stream_tcp_ip);
     
 };
 

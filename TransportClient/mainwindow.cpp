@@ -53,6 +53,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->pushButton_ExtudeAnOreder, SIGNAL(clicked()), this, SLOT(SendItem()));
 
+    //-------------------------------------------------------//
+    m_AddPreorderWidget = new Dialogaddpreorder(this);
+    m_AddPreorderWidget->setTCPSocket(m_TCPSocket);
+
 }
 
 
@@ -82,6 +86,13 @@ void MainWindow::onReadyRead()
             case const_hash("fulfillment"): AnswerToKey_fulfillment(br.stream()); break;
         }
 
+        if(m_AddPreorderWidget)
+        {
+            if(m_AddPreorderWidget->isEnabled())
+            {
+               m_AddPreorderWidget->onReadyRead(key,&br);
+            }
+        }
 
         //ui->textEdit->setHtml(ui->textEdit->toHtml() + s.toUtf8() + "<br>");
         //ui->textEdit->setHtml(ui->textEdit->toHtml() + key.toUtf8() + "<br>");
@@ -423,7 +434,8 @@ void MainWindow::AnswerToKey_List(QDataStream &_stream_tcp_ip)
         line->setFrameShape(QFrame::HLine);
         line->setFrameShadow(QFrame::Sunken);
 
-        auto widgetText =  new QLabel("ID: " + QString::number(_Order.ID) + "\n" +
+        auto widgetText =  new QLabel("Manager: " + _Order.Manager + "\n" +
+                                      "ID: " + QString::number(_Order.ID) + "\n" +
                                       "Data: " + _Order.Data + "\n" +
                                       "Weight: " + QString::number(_Order.Weight) + "\n" +
                                       "Address: " + _Order.Address + "\n" +
@@ -490,7 +502,8 @@ void MainWindow::AnswerToKey_fulfillment(QDataStream &_stream_tcp_ip)
         line->setFrameShape(QFrame::HLine);
         line->setFrameShadow(QFrame::Sunken);
 
-        auto widgetText =  new QLabel("Status: " + _Order.Status + "\n" +
+        auto widgetText =  new QLabel("Manager: " + _Order.Manager + "\n" +
+                                      "Status: " + _Order.Status + "\n" +
                                       "ID: " + QString::number(_Order.ID) + "\n" +
                                       "Data: " + _Order.Data + "\n" +
                                       "Weight: " + QString::number(_Order.Weight) + "\n" +
@@ -540,7 +553,7 @@ void MainWindow::AnswerToKey_fulfillment(QDataStream &_stream_tcp_ip)
 //        mMapOrders[itemN].Weight = _Order.Weight;
 //        mMapOrders[itemN].Address = _Order.Address;
 
-        qDebug() << _Order.ID << _Order.Text << _Order.Data << _Order.Username << _Order.Address << _Order.Product << _Order.Status;
+        qDebug() << _Order.Manager<< _Order.ID << _Order.Text << _Order.Data << _Order.Username << _Order.Address << _Order.Product << _Order.Status;
     }
 }
 
@@ -625,5 +638,12 @@ void MainWindow::on_pushButton_fulfillment_clicked()
 
         delete bw;
     }
+}
+
+
+void MainWindow::on_pushButton_AddPreorder_clicked()
+{
+   m_AddPreorderWidget->setUsername(ui->lineEdit_username->text());
+   m_AddPreorderWidget->show();
 }
 

@@ -30,7 +30,6 @@ private slots:
     void on_SelectedClient(QString _current);
 
     void on_checkBox_Calendar_toggled(bool checked);
-
     void on_pushButton_Delete_clicked();
 
 private:

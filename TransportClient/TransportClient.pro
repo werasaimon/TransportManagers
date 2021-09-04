@@ -1,4 +1,4 @@
-QT       += core gui network
+QT       += core gui network sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -14,6 +14,7 @@ SOURCES += \
     ../Common/blockwriter.cpp \
     ../Common/order.cpp \
     ../Common/qjsontablemodel.cpp \
+    dialogaddpreorder.cpp \
     main.cpp \
     mainwindow.cpp
 
@@ -24,9 +25,11 @@ HEADERS += \
     ../Common/order.h \
     ../Common/qjsontablemodel.h \
     ../Common/qoperators.hpp \
+    dialogaddpreorder.h \
     mainwindow.h
 
 FORMS += \
+    dialogaddpreorder.ui \
     mainwindow.ui
 
 # Default rules for deployment.
